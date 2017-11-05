@@ -37,7 +37,7 @@
 #include "snake.h"
 
 int main(){
-	snakeGame();
+	initSnakeParameters();
 
 	while(TRUE){
 
