@@ -22,7 +22,7 @@ void initSnakeParameters(void)
 	currentSnakeSize = STARTINGSIZE;						//SNAKE INITIAL SIZE
 
 	fruit.fruitPositionX = 35; 								//RANDOM VALUE FOR  FRUIT IN X
-	fruit.fruitPositionY = 15; 								//RANDOM VALUE FOR  FRUIT IN Y
+	fruit.fruitPositionY = 7; 								//RANDOM VALUE FOR  FRUIT IN Y
 
 	initMotionSnake();										//CALL TO CONFIGURE MOTION OF THE SNAKE
 
@@ -75,7 +75,7 @@ void createField(void)
 
 void introduceDataToField(void)
 {
-	uint8 snakeCounter;//4-1=3
+	uint8 snakeCounter;
 
 	/*
 	 * In this cycle we are making the body of the snake to appears just to the left side of the head
