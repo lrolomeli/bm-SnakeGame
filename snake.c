@@ -105,7 +105,7 @@ void drawField(void)
 {
 
 	// esta funcion de lcd nokia recibe un vector de 504 elementos
-	//y lo que nosotros tenemos es una matriz 48x84
+	//y lo que nosotros tenemos es una matriz 12x42
 	uint8 fieldRows,fieldColumns;
 	uint8 image[FIELDSIZE];
 	for(fieldRows=BEGIN; fieldRows<VERTICAL_FIELD_SIZE; fieldRows++)
