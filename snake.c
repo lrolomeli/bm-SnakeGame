@@ -120,3 +120,4 @@ void drawField(void)
 
 	LCDNokia_bitmap(image);
 }
+//prueba para que ambos modifiquemos
