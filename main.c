@@ -35,12 +35,32 @@
 
 #include "MK64F12.h"
 #include "snake.h"
+#include "SPI.h"
+#include "LCDNokia5110.h"
 
-int main(){
+/** \brief This is the configuration structure to configure the LCD.
+ * Note that is constants and it is because is only a variable used for configuration*/
+const SPI_ConfigType SPI_Config={SPI_DISABLE_FIFO,
+								 SPI_LOW_POLARITY,
+								 SPI_LOW_PHASE,
+								 SPI_MSB,
+								 SPI_0,
+								 SPI_MASTER,
+								 GPIO_MUX2,
+								 SPI_BAUD_RATE_2,
+								 SPI_FSIZE_8,
+								{GPIO_D,BIT1,BIT2}
+								};
+
+
+int main()
+{
+	SPI_init(&SPI_Config); /*! Configuration function for the LCD port*/
+	LCDNokia_init(); /*! Configuration function for the LCD */
 	initSnakeParameters();
 
 	while(TRUE){
-
+		drawField();
 	}
 
 	return 0;
