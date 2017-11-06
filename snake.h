@@ -15,7 +15,7 @@
 #define HORIZONTAL_FIELD_SIZE 42
 #define STARTPOSITION_Y 6
 #define STARTPOSITION_X 21
-#define STARTINGSIZE 4
+#define STARTINGSIZE 2
 #define FIELDSIZE 504
 
 typedef enum{STOP, MOVE}Motion;

@@ -21,8 +21,8 @@ void initSnakeParameters(void)
 
 	currentSnakeSize = STARTINGSIZE;						//SNAKE INITIAL SIZE
 
-	fruit.fruitPositionX = 35; 								//RANDOM VALUE FOR  FRUIT IN X
-	fruit.fruitPositionY = 7; 								//RANDOM VALUE FOR  FRUIT IN Y
+	fruit.fruitPositionX = 5; 								//RANDOM VALUE FOR  FRUIT IN X
+	fruit.fruitPositionY = 3; 								//RANDOM VALUE FOR  FRUIT IN Y
 
 	initMotionSnake();										//CALL TO CONFIGURE MOTION OF THE SNAKE
 
@@ -104,6 +104,8 @@ void introduceDataToField(void)
 void drawField(void)
 {
 
+	/**Vamos a crear un bitmap apartir de ciertas modificaciones */
+
 	// esta funcion de lcd nokia recibe un vector de 504 elementos
 	//y lo que nosotros tenemos es una matriz 12x42 convertido a un vector
 	uint8 fieldRows,fieldColumns;
@@ -112,7 +114,7 @@ void drawField(void)
 	{
 		for(fieldColumns=BEGIN; fieldColumns<HORIZONTAL_FIELD_SIZE; fieldColumns++)
 		{
-			image[fieldRows*HORIZONTAL_FIELD_SIZE+fieldColumns]=field[fieldRows][fieldColumns];
+			image[fieldRows*HORIZONTAL_FIELD_SIZE+fieldColumns] = field[fieldRows][fieldColumns];
 		}
 	}
 
