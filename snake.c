@@ -7,12 +7,12 @@
 
 #include "MK64F12.h"
 #include "snake.h"
-#include <stdio.h>
+#include "LCDNokia5110.h"
 
-snakeType snake[SNAKE_LENGTH];								//This structure is the snake
-fruitPosition fruit;										//This structure is the fruit of the snake
-uint8 currentSnakeSize;										//Indicates the current size of the snake
-sint8 field[VERTICAL_FIELD_SIZE][HORIZONTAL_FIELD_SIZE];	//Indicates the size of the field
+static snakeType snake[SNAKE_LENGTH];								//This structure is the snake
+static fruitPosition fruit;										//This structure is the fruit of the snake
+static uint8 currentSnakeSize;										//Indicates the current size of the snake
+static uint8 field[VERTICAL_FIELD_SIZE][HORIZONTAL_FIELD_SIZE];	//Indicates the size of the field
 
 void initSnakeParameters(void)
 {
@@ -103,14 +103,18 @@ void introduceDataToField(void)
 
 void drawField(void)
 {
-	uint8 fieldRows, fieldColumns;
 
-	for(fieldRows=VERTICAL_FIELD_SIZE; fieldRows; fieldRows--)
+	// esta funcion de lcd nokia recibe un vector de 504 elementos
+	//y lo que nosotros tenemos es una matriz 48x84
+	uint8 fieldRows,fieldColumns;
+	uint8 image[FIELDSIZE];
+	for(fieldRows=BEGIN; fieldRows<VERTICAL_FIELD_SIZE; fieldRows++)
+	{
+		for(fieldColumns=BEGIN; fieldColumns<HORIZONTAL_FIELD_SIZE; fieldColumns++)
 		{
-			for(fieldColumns=HORIZONTAL_FIELD_SIZE; fieldColumns; fieldColumns--)
-			{
-				printf("%c",field[VERTICAL_FIELD_SIZE-fieldRows][HORIZONTAL_FIELD_SIZE-fieldColumns]);
-			}
-			printf("\n");
+			image[fieldRows*HORIZONTAL_FIELD_SIZE+fieldColumns]=field[fieldRows][fieldColumns];
 		}
+	}
+
+	LCDNokia_bitmap(image);
 }
