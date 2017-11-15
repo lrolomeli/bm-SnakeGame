@@ -57,10 +57,11 @@ int main()
 {
 	SPI_init(&SPI_Config); /*! Configuration function for the LCD port*/
 	LCDNokia_init(); /*! Configuration function for the LCD */
+	LCDNokia_clear();
 	initSnakeParameters();
 
 	while(TRUE){
-		drawField();
+		//drawField();
 	}
 
 	return 0;
