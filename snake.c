@@ -8,11 +8,12 @@
 #include "MK64F12.h"
 #include "snake.h"
 #include "LCDNokia5110.h"
+#include "LCDNokia5110Images.h"
 
 static snakeType snake[SNAKE_LENGTH];								//This structure is the snake
-static fruitPosition fruit;										//This structure is the fruit of the snake
+static fruitPosition fruit;											//This structure is the fruit of the snake
 static uint8 currentSnakeSize;										//Indicates the current size of the snake
-static uint8 field[VERTICAL_FIELD_SIZE][HORIZONTAL_FIELD_SIZE];	//Indicates the size of the field
+static uint8 field[VERTICAL_FIELD_SIZE][HORIZONTAL_FIELD_SIZE] = {0};		//Indicates the size of the field
 
 void initSnakeParameters(void)
 {
@@ -21,8 +22,8 @@ void initSnakeParameters(void)
 
 	currentSnakeSize = STARTINGSIZE;						//SNAKE INITIAL SIZE
 
-	fruit.fruitPositionX = 5; 								//RANDOM VALUE FOR  FRUIT IN X
-	fruit.fruitPositionY = 3; 								//RANDOM VALUE FOR  FRUIT IN Y
+	fruit.fruitPositionX = 47; 								//RANDOM VALUE FOR  FRUIT IN X
+	fruit.fruitPositionY = 2; 								//RANDOM VALUE FOR  FRUIT IN Y
 
 	initMotionSnake();										//CALL TO CONFIGURE MOTION OF THE SNAKE
 
@@ -30,7 +31,9 @@ void initSnakeParameters(void)
 
 	introduceDataToField();									//THIS FUNCTION FILLS THE FIELD WITH ALL INITIAL VALUES
 
-	drawField();											//THIS FUNCTION DRAWS ALL INTIAL DATA ON THE FIELD
+	gameLoop();
+
+	//drawField();											//THIS FUNCTION DRAWS ALL INTIAL DATA ON THE FIELD
 }
 
 void initMotionSnake(void)
@@ -56,21 +59,37 @@ void createField(void)
 	 * This function will only be setting the field
 	 * where snake will be moving on
 	 */
-	for(fieldRows=VERTICAL_FIELD_SIZE; fieldRows; fieldRows--)
+	for(fieldRows = BEGIN; fieldRows < VERTICAL_FIELD_SIZE; fieldRows++)
 	{
-		for(fieldColumns=HORIZONTAL_FIELD_SIZE; fieldColumns; fieldColumns--)
+		for(fieldColumns = BEGIN; fieldColumns < HORIZONTAL_FIELD_SIZE; fieldColumns++)
 		{
-				if((VERTICAL_FIELD_SIZE-fieldRows) == BEGIN || (VERTICAL_FIELD_SIZE-fieldRows) == VERTICAL_FIELD_SIZE-DSTART)
-					field[VERTICAL_FIELD_SIZE-fieldRows][HORIZONTAL_FIELD_SIZE-fieldColumns] = '-';
 
-				else if((HORIZONTAL_FIELD_SIZE-fieldColumns) == BEGIN || (HORIZONTAL_FIELD_SIZE-fieldColumns) == HORIZONTAL_FIELD_SIZE-DSTART)
-					field[VERTICAL_FIELD_SIZE-fieldRows][HORIZONTAL_FIELD_SIZE-fieldColumns] = '|';
+			//FIRST ROW
+			if(fieldRows == BEGIN)
+				field[fieldRows][fieldColumns] = 0x01;
 
-				else
-					field[VERTICAL_FIELD_SIZE-fieldRows][HORIZONTAL_FIELD_SIZE-fieldColumns] = ' ';
+			//LAST ROW
+			else if(fieldRows == VERTICAL_FIELD_SIZE-DSTART)
+				field[fieldRows][fieldColumns] = 0x80;
+
+			//FIRST OR LAST COLUMN
+			else if(fieldColumns == BEGIN || fieldColumns == HORIZONTAL_FIELD_SIZE-DSTART)
+				field[fieldRows][fieldColumns] = 0xFF;
+
+			//NON OF THIS
+			else
+				field[fieldRows][fieldColumns] = 0x00;
+
+			//FIRST ROW BUT IN ADDITION FIRST COLUMN OR LAST COLUMN
+			if(fieldRows == BEGIN && (fieldColumns == BEGIN || fieldColumns == HORIZONTAL_FIELD_SIZE-DSTART))
+				field[fieldRows][fieldColumns] = 0xFF;
+
+			//LAST ROW BUT IN ADDITION FIRST COLUMN OR LAST COLUMN
+			if(fieldRows == VERTICAL_FIELD_SIZE-DSTART && (fieldColumns == BEGIN || fieldColumns == HORIZONTAL_FIELD_SIZE-DSTART))
+				field[fieldRows][fieldColumns] = 0xFF;
+
 		}
 	}
-
 }
 
 void introduceDataToField(void)
@@ -87,10 +106,10 @@ void introduceDataToField(void)
 		snake[currentSnakeSize-snakeCounter].snakePositionX = snake[currentSnakeSize-(snakeCounter+DSTART)].snakePositionX - DSTART;
 		snake[currentSnakeSize-snakeCounter].snakePositionY = snake[currentSnakeSize-(snakeCounter+DSTART)].snakePositionY;
 		/** An X will be simulating the body of the snake*/
-		snake[currentSnakeSize-snakeCounter].image = 'o';
+		snake[currentSnakeSize-snakeCounter].image = 0x01;
 	}
 	/** While an O must be the head of the snake*/
-	snake[BEGIN].image = 'x';
+	snake[BEGIN].image = 0x01;
 
 	/** This loop is in charge of filling the snake on the field*/
 	for(snakeCounter=currentSnakeSize; snakeCounter; snakeCounter--)
@@ -98,7 +117,7 @@ void introduceDataToField(void)
 		field[snake[currentSnakeSize-snakeCounter].snakePositionY][snake[currentSnakeSize-snakeCounter].snakePositionX] = snake[currentSnakeSize-snakeCounter].image;
 	}
 	/** This line is filling the random fruit on the field*/
-	field[fruit.fruitPositionY][fruit.fruitPositionX]='6';
+	field[fruit.fruitPositionY][fruit.fruitPositionX]= 0x01;
 }
 
 void drawField(void)
@@ -107,16 +126,111 @@ void drawField(void)
 	/**Vamos a crear un bitmap apartir de ciertas modificaciones */
 
 	// esta funcion de lcd nokia recibe un vector de 504 elementos
-	//y lo que nosotros tenemos es una matriz 12x42 convertido a un vector
+	//y lo que nosotros tenemos es una matriz 6x84 convertido a un vector
+
 	uint8 fieldRows,fieldColumns;
-	uint8 image[FIELDSIZE];
-	for(fieldRows=BEGIN; fieldRows<VERTICAL_FIELD_SIZE; fieldRows++)
+	uint8 lcdImage[FIELDSIZE];
+
+	for(fieldRows = BEGIN; fieldRows < VERTICAL_FIELD_SIZE; fieldRows++)
 	{
-		for(fieldColumns=BEGIN; fieldColumns<HORIZONTAL_FIELD_SIZE; fieldColumns++)
+		for(fieldColumns = BEGIN; fieldColumns < HORIZONTAL_FIELD_SIZE; fieldColumns++)
 		{
-			image[fieldRows*HORIZONTAL_FIELD_SIZE+fieldColumns] = field[fieldRows][fieldColumns];
+			lcdImage[fieldRows*HORIZONTAL_FIELD_SIZE+fieldColumns] = field[fieldRows][fieldColumns];
+
 		}
 	}
 
-	LCDNokia_bitmap(image);
+	//LCDNokia_bitmap(getImage());
+	LCDNokia_bitmap(lcdImage);
+
+}
+
+
+void gameLoop(void)
+{
+
+	uint8 life = ALIVE;
+
+	do{
+		LCDNokia_clear();
+		drawField();
+		input(&life);
+		update();
+	}while(ALIVE==life);
+
+}
+
+
+void input(uint8* life)
+{
+
+	uint8 snakeCounter;
+
+	//si estamos en alguno de los bordes de la pantalla life debe ser igual a 0
+	if(snake[BEGIN].snakePositionX == BEGIN || snake[BEGIN].snakePositionX == HORIZONTAL_FIELD_SIZE - DSTART || snake[BEGIN].snakePositionY == BEGIN || snake[BEGIN].snakePositionY == VERTICAL_FIELD_SIZE - DSTART)
+		*life = DEAD;
+
+	for(snakeCounter = DSTART; snakeCounter < currentSnakeSize && ALIVE == *life; snakeCounter++)
+	{
+		if(snake[BEGIN].snakePositionX == snake[snakeCounter].snakePositionX && snake[BEGIN].snakePositionY == snake[snakeCounter].snakePositionY)
+			*life = DEAD;
+	}
+
+	//Comprobar si nos hemos comido la fruta
+
+	if(snake[BEGIN].snakePositionX == fruit.fruitPositionX && snake[BEGIN].snakePositionY == fruit.fruitPositionY)
+	{
+		currentSnakeSize++;
+
+		snake[currentSnakeSize - 1].image = 0x01;
+
+		fruit.fruitPositionX = 13; 								//RANDOM VALUE FOR  FRUIT IN X
+		fruit.fruitPositionY = 4; 								//RANDOM VALUE FOR  FRUIT IN Y
+	}
+
+	if(ALIVE == *life)
+	{
+
+		if(2){
+			snake[BEGIN].modifyPositionX=STOP;
+			snake[BEGIN].modifyPositionY=MOVE;
+		}
+
+		if(8){
+			snake[BEGIN].modifyPositionX=STOP;
+			snake[BEGIN].modifyPositionY=NMOVE;
+		}
+
+		if(4){
+			snake[BEGIN].modifyPositionX=NMOVE;
+			snake[BEGIN].modifyPositionY=STOP;
+		}
+
+		if(6){
+			snake[BEGIN].modifyPositionX=MOVE;
+			snake[BEGIN].modifyPositionY=STOP;
+		}
+	}
+
+}
+
+void update(void)
+{
+
+	createField();
+
+	introduceNewDataToField();
+
+}
+
+void introduceNewDataToField(void)
+{
+
+	uint8 snakeCounter;
+
+	for(snakeCounter = currentSnakeSize-DSTART; snakeCounter > BEGIN; snakeCounter--){
+		snake[snakeCounter].snakePositionX = snake[snakeCounter-DSTART].snakePositionX;
+		snake[snakeCounter].snakePositionY = snake[snakeCounter-DSTART].snakePositionY;
+	}
+
 }

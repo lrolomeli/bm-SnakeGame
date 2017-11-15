@@ -11,15 +11,16 @@
 #include "DataTypeDefinitions.h"
 
 #define SNAKE_LENGTH 100
-#define VERTICAL_FIELD_SIZE 12
-#define HORIZONTAL_FIELD_SIZE 42
-#define STARTPOSITION_Y 6
-#define STARTPOSITION_X 21
-#define STARTINGSIZE 2
+#define VERTICAL_FIELD_SIZE 6
+#define HORIZONTAL_FIELD_SIZE 84
+#define STARTPOSITION_Y 3
+#define STARTPOSITION_X 42
+#define STARTINGSIZE 14
 #define FIELDSIZE 504
 
-typedef enum{STOP, MOVE}Motion;
+typedef enum{NMOVE=-1, STOP, MOVE}Motion;
 typedef enum{BEGIN, DSTART}Conditionals;
+typedef enum{DEAD, ALIVE}GameOver;
 
 typedef struct{
 
@@ -43,6 +44,10 @@ void initMotionSnake(void);
 void createField(void);
 void introduceDataToField(void);
 void drawField(void);
+void gameLoop(void);
+void input(uint8* life);
+void update(void);
+void introduceNewDataToField(void);
 
 #endif /* SNAKE_H_ */
 

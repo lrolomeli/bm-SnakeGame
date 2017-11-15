@@ -29,7 +29,7 @@ void LCDNokia_clear(void);
  * from 0 to 5*/
 void LCDNokia_gotoXY(uint8 x, uint8 y);
 /*It allows to write a figure represented by constant array*/
-void LCDNokia_bitmap(uint8*);
+void LCDNokia_bitmap(uint8* my_array);
 /*It write a character in the LCD*/
 void LCDNokia_sendChar(uint8);
 /*It write a string into the LCD*/
