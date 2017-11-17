@@ -10,10 +10,10 @@
 #include "LCDNokia5110.h"
 #include "LCDNokia5110Images.h"
 
-static snakeType snake[SNAKE_LENGTH];								//This structure is the snake
+static snakeType snake[SNAKE_MAX_LENGTH];							//This structure is the snake
 static fruitPosition fruit;											//This structure is the fruit of the snake
 static uint8 currentSnakeSize;										//Indicates the current size of the snake
-static uint8 field[VERTICAL_FIELD_SIZE][HORIZONTAL_FIELD_SIZE] = {0};		//Indicates the size of the field
+static uint8 field[VERTICALFIELD][HORIZONTALFIELD] = {0};			//Indicates the size of the field
 
 void initSnakeParameters(void)
 {
@@ -31,9 +31,9 @@ void initSnakeParameters(void)
 
 	introduceDataToField();									//THIS FUNCTION FILLS THE FIELD WITH ALL INITIAL VALUES
 
-	gameLoop();
+	//gameLoop();
 
-	//drawField();											//THIS FUNCTION DRAWS ALL INTIAL DATA ON THE FIELD
+	drawField();											//THIS FUNCTION DRAWS ALL INTIAL DATA ON THE FIELD
 }
 
 void initMotionSnake(void)
@@ -44,10 +44,10 @@ void initMotionSnake(void)
 	 * X for horizontal axe & Y for vertical, STOP will set them
 	 * Still on their position
 	 */
-	for(moveSnake=currentSnakeSize; moveSnake; moveSnake--)
+	for(moveSnake=BEGIN; moveSnake<currentSnakeSize; moveSnake++)
 	{
-		snake[currentSnakeSize-moveSnake].modifyPositionX = MOVE;
-		snake[currentSnakeSize-moveSnake].modifyPositionY = STOP;
+		snake[moveSnake].modifyPositionX = MOVE;
+		snake[moveSnake].modifyPositionY = STOP;
 	}
 
 }
@@ -59,9 +59,9 @@ void createField(void)
 	 * This function will only be setting the field
 	 * where snake will be moving on
 	 */
-	for(fieldRows = BEGIN; fieldRows < VERTICAL_FIELD_SIZE; fieldRows++)
+	for(fieldRows = BEGIN; fieldRows < VERTICALFIELD; fieldRows++)
 	{
-		for(fieldColumns = BEGIN; fieldColumns < HORIZONTAL_FIELD_SIZE; fieldColumns++)
+		for(fieldColumns = BEGIN; fieldColumns < HORIZONTALFIELD; fieldColumns++)
 		{
 
 			//FIRST ROW
@@ -69,11 +69,11 @@ void createField(void)
 				field[fieldRows][fieldColumns] = 0x01;
 
 			//LAST ROW
-			else if(fieldRows == VERTICAL_FIELD_SIZE-DSTART)
+			else if(fieldRows == VERTICALFIELD-DSTART)
 				field[fieldRows][fieldColumns] = 0x80;
 
 			//FIRST OR LAST COLUMN
-			else if(fieldColumns == BEGIN || fieldColumns == HORIZONTAL_FIELD_SIZE-DSTART)
+			else if(fieldColumns == BEGIN || fieldColumns == HORIZONTALFIELD-DSTART)
 				field[fieldRows][fieldColumns] = 0xFF;
 
 			//NON OF THIS
@@ -81,11 +81,11 @@ void createField(void)
 				field[fieldRows][fieldColumns] = 0x00;
 
 			//FIRST ROW BUT IN ADDITION FIRST COLUMN OR LAST COLUMN
-			if(fieldRows == BEGIN && (fieldColumns == BEGIN || fieldColumns == HORIZONTAL_FIELD_SIZE-DSTART))
+			if(fieldRows == BEGIN && (fieldColumns == BEGIN || fieldColumns == HORIZONTALFIELD-DSTART))
 				field[fieldRows][fieldColumns] = 0xFF;
 
 			//LAST ROW BUT IN ADDITION FIRST COLUMN OR LAST COLUMN
-			if(fieldRows == VERTICAL_FIELD_SIZE-DSTART && (fieldColumns == BEGIN || fieldColumns == HORIZONTAL_FIELD_SIZE-DSTART))
+			if(fieldRows == VERTICALFIELD-DSTART && (fieldColumns == BEGIN || fieldColumns == HORIZONTALFIELD-DSTART))
 				field[fieldRows][fieldColumns] = 0xFF;
 
 		}
@@ -101,20 +101,20 @@ void introduceDataToField(void)
 	 * Starting from DSTART to fill all the body of the snake cause the head is already there
 	 */
 
-	for(snakeCounter=(currentSnakeSize-DSTART); snakeCounter; snakeCounter--)
+	for(snakeCounter=DSTART; snakeCounter<currentSnakeSize; snakeCounter++)
 	{
-		snake[currentSnakeSize-snakeCounter].snakePositionX = snake[currentSnakeSize-(snakeCounter+DSTART)].snakePositionX - DSTART;
-		snake[currentSnakeSize-snakeCounter].snakePositionY = snake[currentSnakeSize-(snakeCounter+DSTART)].snakePositionY;
+		snake[snakeCounter].snakePositionX = snake[snakeCounter-DSTART].snakePositionX - DSTART;
+		snake[snakeCounter].snakePositionY = snake[snakeCounter-DSTART].snakePositionY;
 		/** An X will be simulating the body of the snake*/
-		snake[currentSnakeSize-snakeCounter].image = 0x01;
+		snake[snakeCounter].image = 0x01;
 	}
 	/** While an O must be the head of the snake*/
 	snake[BEGIN].image = 0x01;
 
 	/** This loop is in charge of filling the snake on the field*/
-	for(snakeCounter=currentSnakeSize; snakeCounter; snakeCounter--)
+	for(snakeCounter=BEGIN; snakeCounter<currentSnakeSize; snakeCounter++)
 	{
-		field[snake[currentSnakeSize-snakeCounter].snakePositionY][snake[currentSnakeSize-snakeCounter].snakePositionX] = snake[currentSnakeSize-snakeCounter].image;
+		field[snake[snakeCounter].snakePositionY][snake[snakeCounter].snakePositionX] = snake[snakeCounter].image;
 	}
 	/** This line is filling the random fruit on the field*/
 	field[fruit.fruitPositionY][fruit.fruitPositionX]= 0x01;
@@ -123,24 +123,24 @@ void introduceDataToField(void)
 void drawField(void)
 {
 
-	/**Vamos a crear un bitmap apartir de ciertas modificaciones */
+	/**WE ARE GOING TO CREATE A BIT MAP FROM A BIDIMENSIONAL MATRIX */
 
-	// esta funcion de lcd nokia recibe un vector de 504 elementos
-	//y lo que nosotros tenemos es una matriz 6x84 convertido a un vector
+	// This function receives a vector of 504 elements
+	// and we are going to convert it from a 6 x 84 matrix
 
 	uint8 fieldRows,fieldColumns;
-	uint8 lcdImage[FIELDSIZE];
+	static uint8 lcdImage[FIELDSIZE];
 
-	for(fieldRows = BEGIN; fieldRows < VERTICAL_FIELD_SIZE; fieldRows++)
+	for(fieldRows = BEGIN; fieldRows < VERTICALFIELD; fieldRows++)
 	{
-		for(fieldColumns = BEGIN; fieldColumns < HORIZONTAL_FIELD_SIZE; fieldColumns++)
+		for(fieldColumns = BEGIN; fieldColumns < HORIZONTALFIELD; fieldColumns++)
 		{
-			lcdImage[fieldRows*HORIZONTAL_FIELD_SIZE+fieldColumns] = field[fieldRows][fieldColumns];
-
+			lcdImage[fieldRows*HORIZONTALFIELD+fieldColumns] = field[fieldRows][fieldColumns];
 		}
 	}
-
 	//LCDNokia_bitmap(getImage());
+	lcdImage[502]=0xFF;
+	lcdImage[503]=0xFF;
 	LCDNokia_bitmap(lcdImage);
 
 }
@@ -167,7 +167,7 @@ void input(uint8* life)
 	uint8 snakeCounter;
 
 	//si estamos en alguno de los bordes de la pantalla life debe ser igual a 0
-	if(snake[BEGIN].snakePositionX == BEGIN || snake[BEGIN].snakePositionX == HORIZONTAL_FIELD_SIZE - DSTART || snake[BEGIN].snakePositionY == BEGIN || snake[BEGIN].snakePositionY == VERTICAL_FIELD_SIZE - DSTART)
+	if(snake[BEGIN].snakePositionX == BEGIN || snake[BEGIN].snakePositionX == HORIZONTALFIELD - DSTART || snake[BEGIN].snakePositionY == BEGIN || snake[BEGIN].snakePositionY == VERTICALFIELD - DSTART)
 		*life = DEAD;
 
 	for(snakeCounter = DSTART; snakeCounter < currentSnakeSize && ALIVE == *life; snakeCounter++)

@@ -10,9 +10,9 @@
 
 #include "DataTypeDefinitions.h"
 
-#define SNAKE_LENGTH 100
-#define VERTICAL_FIELD_SIZE 6
-#define HORIZONTAL_FIELD_SIZE 84
+#define SNAKE_MAX_LENGTH 100
+#define VERTICALFIELD 6
+#define HORIZONTALFIELD 84
 #define STARTPOSITION_Y 3
 #define STARTPOSITION_X 42
 #define STARTINGSIZE 14

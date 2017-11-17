@@ -144,8 +144,9 @@ void LCDNokia_init(void) {
 
 void LCDNokia_bitmap(uint8* my_array){
 	uint16 index=0;
-  for (index = 0 ; index < (LCD_X * LCD_Y / 8) ; index++)
-	  LCDNokia_writeByte(LCD_DATA, *(my_array+index));
+
+	for (index = 0 ; index < (LCD_X * LCD_Y / 8) ; index++)
+		LCDNokia_writeByte(LCD_DATA, *(my_array+index));
 }
 
 
