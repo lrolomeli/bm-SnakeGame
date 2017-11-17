@@ -139,8 +139,8 @@ void drawField(void)
 		}
 	}
 	//LCDNokia_bitmap(getImage());
-	lcdImage[502]=0xFF;
-	lcdImage[503]=0xFF;
+	//lcdImage[502]=0xFF;
+	//lcdImage[503]=0xFF;
 	LCDNokia_bitmap(lcdImage);
 
 }
