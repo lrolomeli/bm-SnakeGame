@@ -9,6 +9,7 @@
 #include "snake.h"
 #include "LCDNokia5110.h"
 #include "LCDNokia5110Images.h"
+#include "PIT.h"
 
 static snakeType snake[SNAKE_MAX_LENGTH];							//This structure is the snake
 static fruitPosition fruit;											//This structure is the fruit of the snake
@@ -31,9 +32,9 @@ void initSnakeParameters(void)
 
 	introduceDataToField();									//THIS FUNCTION FILLS THE FIELD WITH ALL INITIAL VALUES
 
-	//gameLoop();
+	gameLoop();
 
-	drawField();											//THIS FUNCTION DRAWS ALL INTIAL DATA ON THE FIELD
+	//drawField();											//THIS FUNCTION DRAWS ALL INTIAL DATA ON THE FIELD
 }
 
 void initMotionSnake(void)
@@ -117,7 +118,7 @@ void introduceDataToField(void)
 		field[snake[snakeCounter].snakePositionY][snake[snakeCounter].snakePositionX] = snake[snakeCounter].image;
 	}
 	/** This line is filling the random fruit on the field*/
-	field[fruit.fruitPositionY][fruit.fruitPositionX]= 0x01;
+	field[fruit.fruitPositionY][fruit.fruitPositionX] = 0x01;
 }
 
 void drawField(void)
@@ -138,6 +139,7 @@ void drawField(void)
 			lcdImage[fieldRows*HORIZONTALFIELD+fieldColumns] = field[fieldRows][fieldColumns];
 		}
 	}
+
 	//LCDNokia_bitmap(getImage());
 	//lcdImage[502]=0xFF;
 	//lcdImage[503]=0xFF;
@@ -156,7 +158,11 @@ void gameLoop(void)
 		drawField();
 		input(&life);
 		update();
+		PIT_delay(PIT_0, SYSTEMCLOCK, 0.1);
+		while(!PIT_getIntrStatus());	//secure count to 10ms after reseting LCD
 	}while(ALIVE==life);
+
+	printf("GAME OVER\n");
 
 }
 
@@ -191,22 +197,26 @@ void input(uint8* life)
 	if(ALIVE == *life)
 	{
 
-		if(2){
+		if(2 && snake[BEGIN].modifyPositionY != NMOVE)
+		{
 			snake[BEGIN].modifyPositionX=STOP;
 			snake[BEGIN].modifyPositionY=MOVE;
 		}
 
-		if(8){
+		if(8 && snake[BEGIN].modifyPositionY != MOVE)
+		{
 			snake[BEGIN].modifyPositionX=STOP;
 			snake[BEGIN].modifyPositionY=NMOVE;
 		}
 
-		if(4){
+		if(4 && snake[BEGIN].modifyPositionX != MOVE)
+		{
 			snake[BEGIN].modifyPositionX=NMOVE;
 			snake[BEGIN].modifyPositionY=STOP;
 		}
 
-		if(6){
+		if(6 && snake[BEGIN].modifyPositionX != NMOVE)
+		{
 			snake[BEGIN].modifyPositionX=MOVE;
 			snake[BEGIN].modifyPositionY=STOP;
 		}
@@ -216,7 +226,7 @@ void input(uint8* life)
 
 void update(void)
 {
-
+	//CLEAR ALL DATA ON FIELD
 	createField();
 
 	introduceNewDataToField();
@@ -228,10 +238,21 @@ void introduceNewDataToField(void)
 
 	uint8 snakeCounter;
 
-	for(snakeCounter = currentSnakeSize-DSTART; snakeCounter > BEGIN; snakeCounter--){
+	for(snakeCounter = currentSnakeSize-DSTART; snakeCounter > BEGIN; snakeCounter--)
+	{
 		snake[snakeCounter].snakePositionX = snake[snakeCounter-DSTART].snakePositionX;
 		snake[snakeCounter].snakePositionY = snake[snakeCounter-DSTART].snakePositionY;
 	}
+
+	snake[BEGIN].snakePositionX += snake[BEGIN].modifyPositionX;
+	snake[BEGIN].snakePositionY += snake[BEGIN].modifyPositionY;
+
+	for(snakeCounter = BEGIN; snakeCounter < currentSnakeSize; snakeCounter++)
+	{
+		field[snake[snakeCounter].snakePositionY][snake[snakeCounter].snakePositionX] = snake[snakeCounter].image;
+	}
+
+	field[fruit.fruitPositionX][fruit.fruitPositionY] = 0x01;
 
 }
 //prueba para que ambos modifiquemos
