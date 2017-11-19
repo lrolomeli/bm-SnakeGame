@@ -37,6 +37,7 @@
 #include "snake.h"
 #include "SPI.h"
 #include "LCDNokia5110.h"
+#include "button.h"
 
 /** \brief This is the configuration structure to configure the LCD.
  * Note that is constants and it is because is only a variable used for configuration*/
@@ -55,6 +56,7 @@ const SPI_ConfigType SPI_Config={SPI_DISABLE_FIFO,
 
 int main()
 {
+	buttonsReady();
 	SPI_init(&SPI_Config); /*! Configuration function for the LCD port*/
 	LCDNokia_init(); /*! Configuration function for the LCD */
 	LCDNokia_clear();

@@ -11,9 +11,7 @@
 
 #include "DataTypeDefinitions.h"
 
-
 #define ERROR 0x02
-
 
 typedef struct
 {
@@ -36,9 +34,9 @@ typedef struct
 #define GPIO_CLOCK_GATING_PORTE 0x00002000
 
 
-/** Selects a pullup resistor */
+/** Selects a pull up resistor */
 #define GPIO_PS    0x00000001
-/** Enables the pulldown or pullup resistors*/
+/** Enables the pull down or pull up resistors*/
 #define GPIO_PE    0x00000002
 /** Selects slow or fast slew rate */
 #define GPIO_SRE   0x00000004
@@ -229,5 +227,7 @@ void GPIO_clearPIN(GPIO_portNameType portName, uint8 pin);
  	 \return void
  */
 void GPIO_tooglePIN(GPIO_portNameType portName, uint8 pin);
+
+uint8 getMotion(void);
 
 #endif /* GPIO_H_ */

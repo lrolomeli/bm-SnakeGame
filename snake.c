@@ -10,6 +10,7 @@
 #include "LCDNokia5110.h"
 #include "LCDNokia5110Images.h"
 #include "PIT.h"
+#include "GPIO.h"
 
 static snakeType snake[SNAKE_MAX_LENGTH];							//This structure is the snake
 static fruitPosition fruit;											//This structure is the fruit of the snake
@@ -23,8 +24,8 @@ void initSnakeParameters(void)
 
 	currentSnakeSize = STARTINGSIZE;						//SNAKE INITIAL SIZE
 
-	fruit.fruitPositionX = 47; 								//RANDOM VALUE FOR  FRUIT IN X
-	fruit.fruitPositionY = 2; 								//RANDOM VALUE FOR  FRUIT IN Y
+	fruit.fruitPositionX = 12; 								//RANDOM VALUE FOR  FRUIT IN X
+	fruit.fruitPositionY = 5; 								//RANDOM VALUE FOR  FRUIT IN Y
 
 	initMotionSnake();										//CALL TO CONFIGURE MOTION OF THE SNAKE
 
@@ -152,17 +153,19 @@ void gameLoop(void)
 {
 
 	uint8 life = ALIVE;
+	uint8 string1[]="GAME OVER"; /*! String to be printed in the LCD*/
 
 	do{
 		LCDNokia_clear();
 		drawField();
 		input(&life);
 		update();
-		PIT_delay(PIT_0, SYSTEMCLOCK, 0.1);
+		PIT_delay(PIT_0, SYSTEMCLOCK, 0.15);
 		while(!PIT_getIntrStatus());	//secure count to 10ms after reseting LCD
 	}while(ALIVE==life);
 
-	printf("GAME OVER\n");
+	LCDNokia_gotoXY(10,2);
+	LCDNokia_sendString(string1); /*! It print a string stored in an array*/
 
 }
 
@@ -194,28 +197,29 @@ void input(uint8* life)
 		fruit.fruitPositionY = 4; 								//RANDOM VALUE FOR  FRUIT IN Y
 	}
 
-	if(ALIVE == *life)
+	if(ALIVE == *life && 4 != getMotion())
 	{
 
-		if(2 && snake[BEGIN].modifyPositionY != NMOVE)
+		if(0 == getMotion() && snake[BEGIN].modifyPositionY != NMOVE)		//UP
 		{
 			snake[BEGIN].modifyPositionX=STOP;
 			snake[BEGIN].modifyPositionY=MOVE;
+
 		}
 
-		if(8 && snake[BEGIN].modifyPositionY != MOVE)
+		if(1 == getMotion() && snake[BEGIN].modifyPositionY != MOVE)	//DOWN
 		{
 			snake[BEGIN].modifyPositionX=STOP;
 			snake[BEGIN].modifyPositionY=NMOVE;
 		}
 
-		if(4 && snake[BEGIN].modifyPositionX != MOVE)
+		if(2 == getMotion() && snake[BEGIN].modifyPositionX != MOVE)	//LEFT
 		{
 			snake[BEGIN].modifyPositionX=NMOVE;
 			snake[BEGIN].modifyPositionY=STOP;
 		}
 
-		if(6 && snake[BEGIN].modifyPositionX != NMOVE)
+		if(6 == getMotion() && snake[BEGIN].modifyPositionX != NMOVE)	//RIGHT
 		{
 			snake[BEGIN].modifyPositionX=MOVE;
 			snake[BEGIN].modifyPositionY=STOP;
@@ -237,6 +241,7 @@ void introduceNewDataToField(void)
 {
 
 	uint8 snakeCounter;
+	uint8 variable = 1;
 
 	for(snakeCounter = currentSnakeSize-DSTART; snakeCounter > BEGIN; snakeCounter--)
 	{
@@ -244,13 +249,54 @@ void introduceNewDataToField(void)
 		snake[snakeCounter].snakePositionY = snake[snakeCounter-DSTART].snakePositionY;
 	}
 
-	snake[BEGIN].snakePositionX += snake[BEGIN].modifyPositionX;
-	snake[BEGIN].snakePositionY += snake[BEGIN].modifyPositionY;
+	//queremos que solamente se copie la direccion en x porque
 
-	for(snakeCounter = BEGIN; snakeCounter < currentSnakeSize; snakeCounter++)
-	{
-		field[snake[snakeCounter].snakePositionY][snake[snakeCounter].snakePositionX] = snake[snakeCounter].image;
+	snake[BEGIN].snakePositionX += snake[BEGIN].modifyPositionX;
+
+	//hacer una funcion que solamente incremente la posicion en Y cuando se presenta el pixel mas alto para subir o mas bajo para bajar
+
+	if(snake[BEGIN].modifyPositionY == MOVE){
+		if(1 == variable){
+			variable = 128;
+			snake[BEGIN].snakePositionY += NMOVE;
+		}
+
+		else
+		{
+			for(snakeCounter = BEGIN; snakeCounter < currentSnakeSize; snakeCounter++)
+			{
+				field[snake[snakeCounter].snakePositionY][snake[snakeCounter].snakePositionX] = variable*2;
+			}
+		}
 	}
+
+	else if(snake[BEGIN].modifyPositionY == NMOVE)
+	{
+		if(128 == variable){
+			variable = 1;
+			snake[BEGIN].snakePositionY += MOVE;
+		}
+
+		else
+		{
+			for(snakeCounter = BEGIN; snakeCounter < currentSnakeSize; snakeCounter++)
+			{
+				if(BEGIN)
+					field[snake[snakeCounter].snakePositionY][snake[snakeCounter].snakePositionX] = variable/2;
+				else
+					field[snake[snakeCounter].snakePositionY][snake[snakeCounter].snakePositionX] = variable/2;
+			}
+		}
+	}
+
+	else
+	{
+		for(snakeCounter = BEGIN; snakeCounter < currentSnakeSize; snakeCounter++)
+		{
+			field[snake[snakeCounter].snakePositionY][snake[snakeCounter].snakePositionX] = snake[snakeCounter].image;
+		}
+	}
+
 
 	field[fruit.fruitPositionX][fruit.fruitPositionY] = 0x01;
 
