@@ -15,10 +15,13 @@
 #define HORIZONTALFIELD 84
 #define STARTPOSITION_Y 3
 #define STARTPOSITION_X 42
-#define STARTINGSIZE 14
+#define STARTINGSIZE 8
 #define FIELDSIZE 504
+#define TWICE 2
 
-typedef enum{NMOVE=-1, STOP, MOVE}Motion;
+typedef enum{NMOVE = -1, STOP, MOVE}MotionX;
+typedef enum{UP = -1, DOWN = 1}MotionY;
+typedef enum{HIGHEST = 1, LOWEST = 128}Pixels;
 typedef enum{BEGIN, DSTART}Conditionals;
 typedef enum{DEAD, ALIVE}GameOver;
 
@@ -45,9 +48,10 @@ void createField(void);
 void introduceDataToField(void);
 void drawField(void);
 void gameLoop(void);
-void input(uint8* life);
+void input(void);
 void update(void);
 void introduceNewDataToField(void);
+void moveSnakeAxisY(void);
 
 #endif /* SNAKE_H_ */
 
