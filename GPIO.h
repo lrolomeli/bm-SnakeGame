@@ -230,4 +230,6 @@ void GPIO_tooglePIN(GPIO_portNameType portName, uint8 pin);
 
 uint8 getMotion(void);
 
+void setMotion(void);
+
 #endif /* GPIO_H_ */

@@ -10,7 +10,15 @@
 
 GPIO_interruptFlags_t GPIO_intrStatusFlag = {0};
 
-uint8 motion=4;
+uint8 motion = 4;
+
+
+void setMotion(void)
+{
+
+	motion = 4;
+
+}
 
 
 uint8 getMotion(void)

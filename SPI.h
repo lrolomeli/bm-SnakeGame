@@ -135,6 +135,6 @@ void SPI_sendOneByte(uint8 Data);
  * the configuration parameters*/
 void SPI_init(const SPI_ConfigType* SPI_Config);
 
-
+void initSPI(void);
 
 #endif /* SPI_H_ */

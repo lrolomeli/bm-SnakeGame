@@ -18,7 +18,7 @@ static uint8 field[VERTICALFIELD][HORIZONTALFIELD] = {0};			//Indicates the size
 static uint8 life = ALIVE;											//Indicates whether snake is alive
 static uint8 eatenFruit = FALSE;									//flag for eaten fruit
 static uint8 lastTailPositionX, lastTailPositionY, lastTailImage;						//Tail image and position previous run
-static uint8 string1[] = "GAME OVER"; 								//String to be printed in the LCD
+static uint8 endGame[] = "GAME OVER"; 								//String to be printed in the LCD
 
 void initSnakeParameters(void)
 {
@@ -36,7 +36,6 @@ void initSnakeParameters(void)
 
 	introduceDataToField();									//THIS FUNCTION FILLS THE FIELD WITH ALL INITIAL VALUES
 
-	gameLoop();
 }
 
 void initMotionSnake(void)
@@ -152,19 +151,41 @@ void drawField(void)
 void gameLoop(void)
 {
 
+	PIT_delay(PIT_0, SYSTEMCLOCK, 0.0001);
+
 	do{
 
-		LCDNokia_clear();
-		drawField();
-		input();
-		update();
-		PIT_delay(PIT_0, SYSTEMCLOCK, 0.1);
-		while(!PIT_getIntrStatus());
+		if(FALSE != PIT_getIntrStatus())
+		{
+			LCDNokia_clear();
+			drawField();
+			input();
+			update();
+			PIT_delay(PIT_0, SYSTEMCLOCK, 0.1);
+		}
 
-	}while(ALIVE==life);
+		if(DEAD == life)
+			setMotion();
+
+	}while(ALIVE == life/*&& 0 != getBackButton()*/); //Continue the game while we are alive and back have not been pressed
+
+	//if(back was pressed do not finish the game)
+	//{
+	//
+	//}
+
+	//else
+	//{
 
 	LCDNokia_gotoXY(10,2);
-	LCDNokia_sendString(string1); /*! It print a string stored in an array*/
+	LCDNokia_sendString(endGame); /*! It print a string stored in an array*/
+
+	if(3 == getMotion()){
+		initSnakeParameters();
+		life = ALIVE;
+	}
+
+	//}
 
 }
 
