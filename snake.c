@@ -8,7 +8,6 @@
 #include "MK64F12.h"
 #include "snake.h"
 #include "LCDNokia5110.h"
-#include "LCDNokia5110Images.h"
 #include "PIT.h"
 #include "GPIO.h"
 
@@ -17,9 +16,8 @@ static fruitPosition fruit;											//This structure is the fruit of the snake
 static uint8 currentSnakeSize;										//Indicates the current size of the snake
 static uint8 field[VERTICALFIELD][HORIZONTALFIELD] = {0};			//Indicates the size of the field
 static uint8 life = ALIVE;											//Indicates whether snake is alive
-static uint8 pixel;													//Moves snake vertically
 static uint8 eatenFruit = FALSE;									//flag for eaten fruit
-static uint8 lastTailPosition, lastTailImage;						//Tail image and position previous run
+static uint8 lastTailPositionX, lastTailPositionY, lastTailImage;						//Tail image and position previous run
 static uint8 string1[] = "GAME OVER"; 								//String to be printed in the LCD
 
 void initSnakeParameters(void)
@@ -39,8 +37,6 @@ void initSnakeParameters(void)
 	introduceDataToField();									//THIS FUNCTION FILLS THE FIELD WITH ALL INITIAL VALUES
 
 	gameLoop();
-
-	//drawField();											//THIS FUNCTION DRAWS ALL INTIAL DATA ON THE FIELD
 }
 
 void initMotionSnake(void)
@@ -124,7 +120,9 @@ void introduceDataToField(void)
 		field[snake[snakeCounter].snakePositionY][snake[snakeCounter].snakePositionX] = snake[snakeCounter].image;
 	}
 	/** This line is filling the random fruit on the field*/
-	field[fruit.fruitPositionY][fruit.fruitPositionX] = 0x01;
+	fruit.image = 0x01;
+
+	field[fruit.fruitPositionY][fruit.fruitPositionX] = fruit.image;
 }
 
 void drawField(void)
@@ -135,7 +133,7 @@ void drawField(void)
 	// This function receives a vector of 504 elements
 	// and we are going to convert it from a 6 x 84 matrix
 
-	uint8 fieldRows,fieldColumns;
+	uint8 fieldRows, fieldColumns;
 	static uint8 lcdImage[FIELDSIZE];
 
 	for(fieldRows = BEGIN; fieldRows < VERTICALFIELD; fieldRows++)
@@ -146,9 +144,6 @@ void drawField(void)
 		}
 	}
 
-	//LCDNokia_bitmap(getImage());
-	//lcdImage[502]=0xFF;
-	//lcdImage[503]=0xFF;
 	LCDNokia_bitmap(lcdImage);
 
 }
@@ -158,12 +153,14 @@ void gameLoop(void)
 {
 
 	do{
+
 		LCDNokia_clear();
 		drawField();
 		input();
 		update();
-		PIT_delay(PIT_0, SYSTEMCLOCK, 0.9);
-		while(!PIT_getIntrStatus());	//secure count to 10ms after reseting LCD
+		PIT_delay(PIT_0, SYSTEMCLOCK, 0.1);
+		while(!PIT_getIntrStatus());
+
 	}while(ALIVE==life);
 
 	LCDNokia_gotoXY(10,2);
@@ -177,85 +174,92 @@ void input(void)
 
 	uint8 snakeCounter;
 
-	//si estamos en alguno de los bordes de la pantalla life debe ser igual a 0
-	if(snake[BEGIN].snakePositionX == BEGIN || snake[BEGIN].snakePositionX == HORIZONTALFIELD - DSTART || snake[BEGIN].snakePositionY == BEGIN || snake[BEGIN].snakePositionY == VERTICALFIELD - DSTART)
+	//We must check if the head of the snake is in any border of the field
+	if(snake[BEGIN].snakePositionX == BEGIN || snake[BEGIN].snakePositionX == HORIZONTALFIELD - DSTART || (snake[BEGIN].snakePositionY == BEGIN && snake[BEGIN].image & 0x01) || (snake[BEGIN].snakePositionY == VERTICALFIELD - DSTART && snake[BEGIN].image & 0x80))
 		life = DEAD;
-
+	//And of course check if the head has eaten its body
 	for(snakeCounter = DSTART; snakeCounter < currentSnakeSize && ALIVE == life; snakeCounter++)
 	{
-		if(snake[BEGIN].snakePositionX == snake[snakeCounter].snakePositionX && snake[BEGIN].image == snake[snakeCounter].image)
+		if(snake[BEGIN].snakePositionX == snake[snakeCounter].snakePositionX && snake[BEGIN].snakePositionY == snake[snakeCounter].snakePositionY && snake[BEGIN].image == snake[snakeCounter].image)
 			life = DEAD;
 	}
 
-	//Comprobar si nos hemos comido la fruta
-
-	//si el gusano se ha comido la fruta debe entonces crecer su cuerpo en uno
-	//se debera copiar la imagen de la cola y agregarla en el siguiente refresco de la pantalla es decir
-	//ya que la cabeza se haya desplazado en uno
-	//por lo tanto al comprobar que se ha comido la fruta debemos guardar la imagen y la posicion de la cola
-	//y en la siguiente impresion agregarle un elemento a la serpiente con la imagen y posicion anterior de la cola.
+	//If the head is in the same position as fruit and with the exactly same image then fruit was eaten
 
 	if(eatenFruit)
 	{
-		currentSnakeSize++;
+		currentSnakeSize++;												//adding one element to the body of the snake
 
-		snake[currentSnakeSize - 1].modifyPositionX = lastTailPosition;
-		snake[currentSnakeSize - 1].image = lastTailImage;
+		snake[currentSnakeSize - 1].snakePositionX = lastTailPositionX;	//Saving x position of tail of the snake
+		snake[currentSnakeSize - 1].snakePositionY = lastTailPositionY;	//Saving y position of tail of the snake
+		snake[currentSnakeSize - 1].image = lastTailImage;				//Saving image of tail of the snake
 
 		fruit.fruitPositionX = 13; 								//RANDOM VALUE FOR  FRUIT IN X
 		fruit.fruitPositionY = 4; 								//RANDOM VALUE FOR  FRUIT IN Y
+		fruit.image = 0x02;
 
 		eatenFruit = FALSE;
 
 	}
 
-	if(snake[BEGIN].snakePositionX == fruit.fruitPositionX && snake[BEGIN].snakePositionY == fruit.fruitPositionY)
+	if(snake[BEGIN].snakePositionX == fruit.fruitPositionX && snake[BEGIN].snakePositionY == fruit.fruitPositionY && snake[BEGIN].image == fruit.image)
 	{
-		//encender una bandera
+		//This flag indicates that fruit was eaten so the last position will be copied
+		//And will be send on the next move of the snake
 		eatenFruit = TRUE;
 
-		//guardar la posicion en X, la imagen de la cola
-		lastTailPosition = snake[currentSnakeSize - 1].modifyPositionX;
+		//This part saves the position and image of the current tail so the next tail will be incremented
+		lastTailPositionX = snake[currentSnakeSize - 1].snakePositionX;
+		lastTailPositionY = snake[currentSnakeSize - 1].snakePositionY;
 		lastTailImage = snake[currentSnakeSize - 1].image;
 	}
 
-	if(4 != getMotion()){
+	//If button 3 is pressed then snake will start moving right
+	if(3 == getMotion()){
 
-		if(ALIVE == life)
+		if(ALIVE == life) //of course while we are alive
 		{
 
-			if(0 == getMotion() && snake[BEGIN].modifyPositionY != UP)		//DOWN
+			if(0 == getMotion() && snake[BEGIN].modifyPositionY != UP)		//DOWN	/**cannot go down while moving up*/
 			{
-				snake[BEGIN].modifyPositionX=STOP;
-				snake[BEGIN].modifyPositionY=DOWN;
-
+				snake[BEGIN].modifyPositionX = STOP;
+				snake[BEGIN].modifyPositionY = DOWN;
 			}
 
-			if(1 == getMotion() && snake[BEGIN].modifyPositionY != DOWN)	//UP
+			if(1 == getMotion() && snake[BEGIN].modifyPositionY != DOWN)	//UP	/**cannot go up down while moving down*/
 			{
-				snake[BEGIN].modifyPositionX=STOP;
-				snake[BEGIN].modifyPositionY=UP;
+				snake[BEGIN].modifyPositionX = STOP;
+				snake[BEGIN].modifyPositionY = UP;
 			}
 
-			if(2 == getMotion() && snake[BEGIN].modifyPositionX != MOVE)	//LEFT
+			if(2 == getMotion() && snake[BEGIN].modifyPositionX != MOVE)	//LEFT	/**cannot go left down while moving right*/
 			{
-				snake[BEGIN].modifyPositionX=NMOVE;
-				snake[BEGIN].modifyPositionY=STOP;
+				snake[BEGIN].modifyPositionX = NMOVE;
+				snake[BEGIN].modifyPositionY = STOP;
 			}
 
-			if(3 == getMotion() && snake[BEGIN].modifyPositionX != NMOVE)	//RIGHT
+			if(3 == getMotion() && snake[BEGIN].modifyPositionX != NMOVE)	//RIGHT	/**cannot go right down while moving left*/
 			{
-				snake[BEGIN].modifyPositionX=MOVE;
-				snake[BEGIN].modifyPositionY=STOP;
+				snake[BEGIN].modifyPositionX = MOVE;
+				snake[BEGIN].modifyPositionY = STOP;
 			}
 		}
 
+		/*
+		 * On this loop we are making that last element of the snake follows the next one in line
+		 */
 		for(snakeCounter = currentSnakeSize-DSTART; snakeCounter > BEGIN; snakeCounter--)
 		{
-			snake[snakeCounter].snakePositionX = snake[snakeCounter-DSTART].snakePositionX;
-			//snake[snakeCounter].snakePositionY = snake[snakeCounter-DSTART].snakePositionY;/**Only we are copying positions in AXIS X and pixels in AXIS Y*/
-			snake[snakeCounter].image = snake[snakeCounter-DSTART].image;
+			snake[snakeCounter].snakePositionX = snake[snakeCounter-DSTART].snakePositionX;		//Copying next X position in line
+
+			if(snake[snakeCounter].snakePositionY == snake[snakeCounter-DSTART].snakePositionY)	//In case that previous element and the next element had the same position
+				snake[snakeCounter].image |= snake[snakeCounter-DSTART].image;					//We are going to make the image of the last one masked with the image of the next
+			else
+				snake[snakeCounter].image = snake[snakeCounter-DSTART].image;					//otherwise we will just copy next image in line
+
+			snake[snakeCounter].snakePositionY = snake[snakeCounter-DSTART].snakePositionY;		//Copying next Y position in line
 		}
+
 	}
 
 
@@ -265,17 +269,53 @@ void update(void)
 {
 	//CLEAR ALL DATA ON FIELD
 	createField();
-
+	//Recalculating values for the snake
 	introduceNewDataToField();
 
 }
+
+
+void moveSnakeAxisY(void)
+{
+
+
+	if(DOWN == snake[BEGIN].modifyPositionY)		//This means they need to change snake position going down 1 but only one pixel
+	{
+		if(LOWEST == snake[BEGIN].image)						//Only if the pixel has the final pixel value
+		{
+			snake[BEGIN].snakePositionY += MOVE;	//We are going to decrement the position of the snake
+			snake[BEGIN].image = HIGHEST;
+		}
+
+		else{
+			snake[BEGIN].image *= TWICE;		//So we are only redrawing the head of the snake so the body can replaced it later
+			/**The head already has the position in AXIS Y*/
+		}
+
+
+	}
+
+	else if(UP == snake[BEGIN].modifyPositionY)		//This means they need to change snake position going up 1 but only one pixel
+	{
+		if(HIGHEST == snake[BEGIN].image)									//Only if the pixel has the final pixel value
+		{
+			snake[BEGIN].snakePositionY += NMOVE;	//We are going to increment the position of the snake
+			snake[BEGIN].image = LOWEST;
+		}
+
+		else{
+			snake[BEGIN].image /= TWICE;		//So we are only redrawing the head of the snake so the body can replaced it later
+			/**The head already has the position in AXIS Y*/
+		}
+	}
+
+}
+
 
 void introduceNewDataToField(void)
 {
 
 	uint8 snakeCounter;
-
-	pixel = snake[BEGIN].image;
 
 	snake[BEGIN].snakePositionX += snake[BEGIN].modifyPositionX;
 
@@ -294,35 +334,3 @@ void introduceNewDataToField(void)
 
 }
 
-void moveSnakeAxisY(void)
-{
-
-	if(UP == snake[BEGIN].modifyPositionY)		//This means they need to change snake position going up 1 but only one pixel
-	{
-		if(HIGHEST==pixel)						//Only if the pixel has the final pixel value
-		{
-			snake[BEGIN].snakePositionY += snake[BEGIN].modifyPositionY;	//We are going to increment the position of the snake
-			pixel = LOWEST;													//And set the first pixel of the other column
-		}
-
-		else	pixel /= TWICE;					//Otherwise pixel will receive the next top pixel
-
-		snake[BEGIN].image = pixel;				//So we are only redrawing the head of the snake so the body can replaced it later
-		/**The head already has the position in AXIS Y*/
-	}
-
-	else if(DOWN == snake[BEGIN].modifyPositionY)		//This means they need to change snake position going down 1 but only one pixel
-	{
-		if(LOWEST==pixel)						//Only if the pixel has the final pixel value
-		{
-			snake[BEGIN].snakePositionY += snake[BEGIN].modifyPositionY;	//We are going to decrement the position of the snake
-			pixel = HIGHEST;													//And set the last pixel of the other column
-		}
-
-		else	pixel *= TWICE;					//Otherwise pixel will receive the next bottom pixel
-
-		snake[BEGIN].image = pixel;				//So we are only redrawing the head of the snake so the body can replaced it later
-		/**The head already has the position in AXIS Y*/
-	}
-
-}

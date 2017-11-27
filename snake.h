@@ -20,7 +20,7 @@
 #define TWICE 2
 
 typedef enum{NMOVE = -1, STOP, MOVE}MotionX;
-typedef enum{UP = -1, DOWN = 1}MotionY;
+typedef enum{DOWN = 1, UP}MotionY;
 typedef enum{HIGHEST = 1, LOWEST = 128}Pixels;
 typedef enum{BEGIN, DSTART}Conditionals;
 typedef enum{DEAD, ALIVE}GameOver;
@@ -39,6 +39,7 @@ typedef struct{
 
 	uint8 fruitPositionX;
 	uint8 fruitPositionY;
+	uint8 image;
 
 }fruitPosition;
 
@@ -50,8 +51,9 @@ void drawField(void);
 void gameLoop(void);
 void input(void);
 void update(void);
-void introduceNewDataToField(void);
 void moveSnakeAxisY(void);
+void introduceNewDataToField(void);
+
 
 #endif /* SNAKE_H_ */
 
