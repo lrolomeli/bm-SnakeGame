@@ -12,6 +12,7 @@
 #include "DataTypeDefinitions.h"
 
 #define ERROR 0x02
+#define NOBUTTONPRESSED 4
 
 typedef struct
 {

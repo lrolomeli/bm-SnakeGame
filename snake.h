@@ -19,11 +19,13 @@
 #define FIELDSIZE 504
 #define TWICE 2
 
-typedef enum{NMOVE = -1, STOP, MOVE}MotionX;
+typedef enum{NMOVE = -1, STOP, MOVE}Motion;
+typedef enum{RIGHT = 1, LEFT}MotionX;
 typedef enum{DOWN = 1, UP}MotionY;
 typedef enum{HIGHEST = 1, LOWEST = 128}Pixels;
 typedef enum{BEGIN, DSTART}Conditionals;
 typedef enum{DEAD, ALIVE}GameOver;
+typedef enum{BDOWN, BUP, BLEFT, BRIGHT}ButtonsOfGame;
 
 typedef struct{
 
