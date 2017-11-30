@@ -7,6 +7,7 @@
 
 #include "MK64F12.h"
 #include "GPIO.h"
+#include "snake.h"
 
 GPIO_interruptFlags_t GPIO_intrStatusFlag = {0};
 
@@ -32,13 +33,13 @@ void PORTB_IRQHandler()
 {
 	GPIO_clearInterrupt(GPIO_B);
 	if(!GPIO_readPIN(GPIO_B, BIT18))
-		motion = 0;
+		motion = GDOWN;
 	else if(!GPIO_readPIN(GPIO_B, BIT19))
-		motion = 1;
+		motion = GUP;
 	else if(!GPIO_readPIN(GPIO_B, BIT20))
-		motion = 2;
+		motion = GLEFT;
 	else if(!GPIO_readPIN(GPIO_B, BIT11))
-		motion = 3;
+		motion = GRIGHT;
 
 }
 

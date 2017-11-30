@@ -10,6 +10,7 @@
 #include "LCDNokia5110.h"
 #include "PIT.h"
 #include "GPIO.h"
+#include "accelerometer.h"
 
 static snakeType snake[SNAKE_MAX_LENGTH];							//This structure is the snake
 static fruitPosition fruit;											//This structure is the fruit of the snake
@@ -155,17 +156,20 @@ void gameLoop(void)
 
 	do{
 
+		xyz_Acc();
+
 		if(FALSE != PIT_getIntrStatus())
 		{
 			drawField();
 			input();
 			update();
-			PIT_delay(PIT_0, SYSTEMCLOCK, 0.1);
+			PIT_delay(PIT_0, SYSTEMCLOCK, 0.3);
 		}
 
-		if(DEAD == life)
+		if(DEAD == life){
+			setMotionAcc();//setMotion();
 			setMotion();
-
+		}
 	}while(ALIVE == life/*&& 0 != getBackButton()*/); //Continue the game while we are alive and back have not been pressed
 
 	//if(back was pressed do not finish the game)
@@ -179,7 +183,7 @@ void gameLoop(void)
 	LCDNokia_gotoXY(10,2);
 	LCDNokia_sendString(endGame); /*! It print a string stored in an array*/
 
-	if(3 == getMotion()){
+	if(NOBUTTONPRESSED != getMotion()){
 		LCDNokia_clear();
 		initSnakeParameters();
 		life = ALIVE;
@@ -267,30 +271,30 @@ void input(void)
 	}
 
 	//If button 3 is pressed then snake will start moving right
-	if(NOBUTTONPRESSED != getMotion()){
+	if(NOBUTTONPRESSED != getMotionAcc()){
 
 		if(ALIVE == life) //of course while we are alive
 		{
 
-			if(BDOWN == getMotion() && UP != snake[BEGIN].modifyPositionY)		//DOWN	/**cannot go down while moving up*/
+			if(GDOWN == getMotionAcc()/**getMotion()*/ && UP != snake[BEGIN].modifyPositionY)		//DOWN	/**cannot go down while moving up*/
 			{
 				snake[BEGIN].modifyPositionX = STOP;
 				snake[BEGIN].modifyPositionY = DOWN;
 			}
 
-			if(BUP == getMotion() && DOWN != snake[BEGIN].modifyPositionY)	//UP	/**cannot go up while moving down*/
+			if(GUP == getMotionAcc()/**getMotion()*/ && DOWN != snake[BEGIN].modifyPositionY)		//UP	/**cannot go up while moving down*/
 			{
 				snake[BEGIN].modifyPositionX = STOP;
 				snake[BEGIN].modifyPositionY = UP;
 			}
 
-			if(BLEFT == getMotion() && RIGHT != snake[BEGIN].modifyPositionX)	//LEFT	/**cannot go left while moving right*/
+			if(GLEFT == getMotionAcc()/**getMotion()*/ && RIGHT != snake[BEGIN].modifyPositionX)		//LEFT	/**cannot go left while moving right*/
 			{
 				snake[BEGIN].modifyPositionX = LEFT;
 				snake[BEGIN].modifyPositionY = STOP;
 			}
 
-			if(BRIGHT == getMotion() && LEFT != snake[BEGIN].modifyPositionX)	//RIGHT	/**cannot go right while moving left*/
+			if(GRIGHT == getMotionAcc()/**getMotion()*/ && LEFT != snake[BEGIN].modifyPositionX)		//RIGHT	/**cannot go right while moving left*/
 			{
 				snake[BEGIN].modifyPositionX = RIGHT;
 				snake[BEGIN].modifyPositionY = STOP;

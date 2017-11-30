@@ -25,7 +25,7 @@ typedef enum{DOWN = 1, UP}MotionY;
 typedef enum{HIGHEST = 1, LOWEST = 128}Pixels;
 typedef enum{BEGIN, DSTART}Conditionals;
 typedef enum{DEAD, ALIVE}GameOver;
-typedef enum{BDOWN, BUP, BLEFT, BRIGHT}ButtonsOfGame;
+typedef enum{GDOWN, GUP, GLEFT, GRIGHT}Moving;
 
 typedef struct{
 
