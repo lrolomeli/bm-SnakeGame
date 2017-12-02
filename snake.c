@@ -27,6 +27,7 @@ static uint8 score = FALSE;
 
 void initSnakeParameters(void)
 {
+
 	snake[BEGIN].snakePositionX = STARTPOSITION_X;			//THIS WILL ONLY BE THE HEAD OF THE SNAKE
 	snake[BEGIN].snakePositionY = STARTPOSITION_Y;			//SNAKE WILL START AT THE MIDDLE OF THE SCREEN
 

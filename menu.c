@@ -22,9 +22,9 @@ void screenMenu(void)
 
 	if(1!=local)
 	{
-		uint8 string1[]="1) PLAY"; /*! String to be printed in the LCD*/
-		uint8 string2[]="2) CONTROLS"; /*! String to be printed in the LCD*/
-		uint8 string3[]="3) SCORES"; /*! String to be printed in the LCD*/
+		uint8 string1[]="!) PLAY"; /*! String to be printed in the LCD*/
+		uint8 string2[]="^) CONTROLS"; /*! String to be printed in the LCD*/
+		uint8 string3[]="<) SCORES"; /*! String to be printed in the LCD*/
 
 		LCDNokia_clear();/*! It clears the information printed in the LCD*/
 		LCDNokia_gotoXY(0,0); /*! It establishes the position to print the messages in the LCD*/
@@ -65,27 +65,28 @@ void loadScores(void)
 
 void setRecord(uint8 score)
 {
-	uint8 change_score0, change_score1, aux_score;
+	uint8 sort2, sort1, aux_score;
 
 	if(score > scores[4])
 		scores[4] = score;
 
-	for(change_score0=0;change_score0<5;change_score0++)
+	for(sort1=0;sort1<5;sort1++)
 	{
 
-		for(change_score1=0;change_score1<5;change_score1++)
+		for(sort2=0;sort2<5;sort2++)
 		{
 
-			if(scores[change_score1]<scores[change_score1+DSTART])
+			if(scores[sort2]<scores[sort2+DSTART])
 			{
-				aux_score = scores[change_score1+DSTART];
-				scores[change_score1+DSTART] = scores[change_score1];
-				scores[change_score1] = aux_score;
+				aux_score = scores[sort2+DSTART];
+				scores[sort2+DSTART] = scores[sort2];
+				scores[sort2] = aux_score;
 			}
 
 
 		}
 	}
+	storeScores();
 }
 
 
@@ -95,16 +96,16 @@ void scoreScreen(void)
 	if(2!=local)
 	{
 
-		uint8 string1[]="1) "; /*! String to be printed in the LCD*/
-		uint8 string2[]="2) "; /*! String to be printed in the LCD*/
-		uint8 string3[]="3) "; /*! String to be printed in the LCD*/
-		uint8 string4[]="4) "; /*! String to be printed in the LCD*/
-		uint8 string5[]="5) "; /*! String to be printed in the LCD*/
+		uint8 string1[]="1)"; /*! String to be printed in the LCD*/
+		uint8 string2[]="2)"; /*! String to be printed in the LCD*/
+		uint8 string3[]="3)"; /*! String to be printed in the LCD*/
+		uint8 string4[]="4)"; /*! String to be printed in the LCD*/
+		uint8 string5[]="5)"; /*! String to be printed in the LCD*/
 
 		LCDNokia_clear();/*! It clears the information printed in the LCD*/
 		LCDNokia_gotoXY(0,0); /*! It establishes the position to print the messages in the LCD*/
 		LCDNokia_sendString(string1); /*! It print a string stored in an array*/
-		LCDNokia_gotoXY(10,0); /*! It establishes the position to print the messages in the LCD*/
+		LCDNokia_gotoXY(15,0); /*! It establishes the position to print the messages in the LCD*/
 		digiToAscii(scores[0]);
 		LCDNokia_sendChar(e);
 		LCDNokia_sendChar(d);
@@ -114,7 +115,7 @@ void scoreScreen(void)
 
 		LCDNokia_gotoXY(0,1);
 		LCDNokia_sendString(string2); /*! It print a string stored in an array*/
-		LCDNokia_gotoXY(10,1); /*! It establishes the position to print the messages in the LCD*/
+		LCDNokia_gotoXY(15,1); /*! It establishes the position to print the messages in the LCD*/
 		digiToAscii(scores[1]);
 		LCDNokia_sendChar(e);
 		LCDNokia_sendChar(d);
@@ -124,7 +125,7 @@ void scoreScreen(void)
 
 		LCDNokia_gotoXY(0,2);
 		LCDNokia_sendString(string3); /*! It print a string stored in an array*/
-		LCDNokia_gotoXY(10,2); /*! It establishes the position to print the messages in the LCD*/
+		LCDNokia_gotoXY(15,2); /*! It establishes the position to print the messages in the LCD*/
 		digiToAscii(scores[2]);
 		LCDNokia_sendChar(e);
 		LCDNokia_sendChar(d);
@@ -134,7 +135,7 @@ void scoreScreen(void)
 
 		LCDNokia_gotoXY(0,3);
 		LCDNokia_sendString(string4); /*! It print a string stored in an array*/
-		LCDNokia_gotoXY(10,3); /*! It establishes the position to print the messages in the LCD*/
+		LCDNokia_gotoXY(15,3); /*! It establishes the position to print the messages in the LCD*/
 		digiToAscii(scores[3]);
 		LCDNokia_sendChar(e);
 		LCDNokia_sendChar(d);
@@ -144,7 +145,7 @@ void scoreScreen(void)
 
 		LCDNokia_gotoXY(0,4);
 		LCDNokia_sendString(string5); /*! It print a string stored in an array*/
-		LCDNokia_gotoXY(10,4); /*! It establishes the position to print the messages in the LCD*/
+		LCDNokia_gotoXY(15,4); /*! It establishes the position to print the messages in the LCD*/
 		digiToAscii(scores[4]);
 		LCDNokia_sendChar(e);
 		LCDNokia_sendChar(d);
@@ -163,14 +164,17 @@ void ctrlScreen(void)
 {
 	if(3!=local)
 	{
-		uint8 string1[]="1) MANUAL"; /*! String to be printed in the LCD*/
-		uint8 string2[]="2) ACCEL"; /*! String to be printed in the LCD*/
+		uint8 string1[]="!) MANUAL"; /*! String to be printed in the LCD*/
+		uint8 string2[]="^) ACCEL"; /*! String to be printed in the LCD*/
+		uint8 string3[]="B) Main Menu"; /*! String to be printed in the LCD*/
 
 		LCDNokia_clear();/*! It clears the information printed in the LCD*/
 		LCDNokia_gotoXY(0,0); /*! It establishes the position to print the messages in the LCD*/
 		LCDNokia_sendString(string1); /*! It print a string stored in an array*/
 		LCDNokia_gotoXY(0,1);
 		LCDNokia_sendString(string2); /*! It print a string stored in an array*/
+		LCDNokia_gotoXY(0,2);
+		LCDNokia_sendString(string3); /*! It print a string stored in an array*/
 
 		local = 3;
 	}

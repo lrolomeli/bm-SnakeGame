@@ -37,7 +37,7 @@ void initGame(void)
 	initSPI();		 /*! Configuration function for the LCD port*/
 
 	IIC_init(I2C_0, busClock, BR_100, mul_4);
-
+	loadScores();
 	configIIC_Acc();
 	wr_Acc();
 
