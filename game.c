@@ -33,17 +33,18 @@ static uint8 currentState = MAINSCREEN;
 void initGame(void)
 {
 
-	buttonsReady();
-	initSPI();		 /*! Configuration function for the LCD port*/
+	buttonsReady(); 	/*! Configuration for input buttons needed*/
+	initSPI();		 	/*! Configuration function for the LCD port*/
 
-	IIC_init(I2C_0, busClock, BR_100, mul_4);
-	loadScores();
-	configIIC_Acc();
-	wr_Acc();
+	IIC_init(I2C_0, busClock, BR_100, mul_4); /*! Configuration for I2C Communication*/
 
-	LCDNokia_init(); /*! Configuration function for the LCD */
-	LCDNokia_clear();
-	initSnakeParameters();
+	loadScores();			/*! Reading scores from EEPROM **************/
+	configIIC_Acc();		/*! Preparing the ambient for accelerometer */
+	wr_Acc();				/*! Configuring the accelerometer on I2C ****/
+
+	LCDNokia_init(); 		/*! Configuration LCD ***********************/
+	LCDNokia_clear();		/*! Cleaning LCD display ********************/
+	initSnakeParameters();	/*! Configuration function for the LCD ******/
 
 }
 

@@ -175,7 +175,7 @@ void gameLoop(void)
 
 		if(DEAD == life)
 		{
-			setMotionAcc();
+			setDirection();
 		}
 
 	}
@@ -283,7 +283,7 @@ void input(void)
 		lastTailImage = snake[currentSnakeSize - 1].image;
 	}
 	//If button 3 is pressed then snake will start moving right
-	if(NOBUTTONPRESSED != getMotionAcc()){
+	if(NOBUTTONPRESSED != getDirection()){
 
 		if(ALIVE == life) //of course while we are alive
 		{
@@ -317,25 +317,25 @@ void input(void)
 
 			else
 			{
-				if(GDOWN == getMotionAcc()/**getMotion()*/ && UP != snake[BEGIN].modifyPositionY)		//DOWN	/**cannot go down while moving up*/
+				if(GDOWN == getDirection()/**getMotion()*/ && UP != snake[BEGIN].modifyPositionY)		//DOWN	/**cannot go down while moving up*/
 				{
 					snake[BEGIN].modifyPositionX = STOP;
 					snake[BEGIN].modifyPositionY = DOWN;
 				}
 
-				if(GUP == getMotionAcc()/**getMotion()*/ && DOWN != snake[BEGIN].modifyPositionY)		//UP	/**cannot go up while moving down*/
+				if(GUP == getDirection()/**getMotion()*/ && DOWN != snake[BEGIN].modifyPositionY)		//UP	/**cannot go up while moving down*/
 				{
 					snake[BEGIN].modifyPositionX = STOP;
 					snake[BEGIN].modifyPositionY = UP;
 				}
 
-				if(GLEFT == getMotionAcc()/**getMotion()*/ && RIGHT != snake[BEGIN].modifyPositionX)		//LEFT	/**cannot go left while moving right*/
+				if(GLEFT == getDirection()/**getMotion()*/ && RIGHT != snake[BEGIN].modifyPositionX)		//LEFT	/**cannot go left while moving right*/
 				{
 					snake[BEGIN].modifyPositionX = LEFT;
 					snake[BEGIN].modifyPositionY = STOP;
 				}
 
-				if(GRIGHT == getMotionAcc()/**getMotion()*/ && LEFT != snake[BEGIN].modifyPositionX)		//RIGHT	/**cannot go right while moving left*/
+				if(GRIGHT == getDirection()/**getMotion()*/ && LEFT != snake[BEGIN].modifyPositionX)		//RIGHT	/**cannot go right while moving left*/
 				{
 					snake[BEGIN].modifyPositionX = RIGHT;
 					snake[BEGIN].modifyPositionY = STOP;

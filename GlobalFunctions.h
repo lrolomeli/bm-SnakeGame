@@ -10,6 +10,9 @@
 
 #include "DataTypeDefinitions.h"
 
+/**
+ * WASTE TIME OF PROCESSOR
+ */
 void delay(uint16);
 
 

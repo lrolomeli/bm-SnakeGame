@@ -12,6 +12,7 @@
 #include "GPIO.h"
 #include "DataTypeDefinitions.h"
 
+/*! Constant to manage INT on falling edge and MUX with GPIO function*/
 #define pinControlRegisterPORTBSW GPIO_MUX1 | INTR_FALLING_EDGE
 
 typedef struct{
@@ -39,8 +40,27 @@ typedef struct
 
 }button_ConfigType;
 
+
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 This function calls button init to configure all buttons needed on PORTB GPIO.
+
+ 	 \param[in]  void.
+ 	 \return void
+ */
 void buttonsReady(void);
 
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 This function clears all interrupts that were sensed by the GPIO.
+
+ 	 \param[in]  button_ConfigType structure type which contains all constants to initialise all buttons
+ 	 \return void
+ */
 void button_init(const button_ConfigType* button_Config);
 
 #endif /* BUTTON_H_ */

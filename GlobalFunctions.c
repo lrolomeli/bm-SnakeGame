@@ -7,7 +7,10 @@
 
 
 #include "GlobalFunctions.h"
-
+/**
+ * DELAY USED ONLY TO WAIT A COMPLETE OPERATION OF
+ * WRITING ON EEPROM NON VOLATILE MEMORY
+ */
 void delay(uint16 delay)
 {
 	volatile int counter, counter2;

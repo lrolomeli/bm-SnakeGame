@@ -14,6 +14,9 @@ GPIO_interruptFlags_t GPIO_intrStatusFlag = {0};
 uint8 buttonPressed = NOBUTTONPRESSED;
 
 
+/**
+ * Setting the button which was pressed to zero
+ */
 void setButton(void)
 {
 
@@ -21,13 +24,24 @@ void setButton(void)
 
 }
 
+
+/**
+ *	SET THE BUTTON ON 3 FOR MANTAINING THE MENU AND EVADE
+ *	COMPLEX AND WEIGHT LOGIC ON A SIMPLE MENU .
+ *
+ */
 void keepPlaying(void)
 {
 
 	buttonPressed = STAY;
+
 }
 
-
+/**
+ * returning the button pressed so that state machine
+ * determine which state to jump to.
+ *
+ */
 uint8 getButton(void)
 {
 
@@ -35,6 +49,11 @@ uint8 getButton(void)
 
 }
 
+/**
+ * With this logic we get the button pressed and then turn a variable with a value
+ * depending on the button which was pressed
+ *
+ */
 void PORTB_IRQHandler()
 {
 	GPIO_clearInterrupt(GPIO_B);

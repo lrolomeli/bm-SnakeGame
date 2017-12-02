@@ -44,14 +44,60 @@ typedef enum {RTC_SC1, RTC_SC2, RTC_SEC, RTC_MIN, RTC_HOURS, RTC_DAY, RTC_WEEKDA
 #define RTC_TIMERCTRL 		0X82		//register for enabling the timer for 1 Hz
 #define RTC_TIMERCNT  		0X3C		//register for timer counting to 60
 
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 This function writes on EEPROM by I2C
+
+ 	 \param[in]  channel , slaveAddress, high address, low address, data
+ 	 \return void
+ */
 void wrByte(I2C_ChannelType channel, uint8 slaveAddress, uint8 hAddress, uint8 lAddress, uint8 data);
 
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 This function reads on EEPROM by I2C
+
+ 	 \param[in]  channel , slaveAddress for read and write, high address, low address
+ 	 \return void
+ */
 uint8 rdByte(I2C_ChannelType channel, uint8 writeAddr, uint8 readAddr, uint8 hAddress, uint8 lAddress);
 
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 This function writes on an I2C device indicating register slave address of the device
+
+ 	 \param[in]  channel , slaveAddress, address, data
+ 	 \return uint8 variable read of memory
+ */
 void wrIIC_Device(I2C_ChannelType channel, uint8 slaveAddress, uint8 address, uint8 data);
 
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 This function reads from an I2C device indicating register slave address of the device
+
+ 	 \param[in]  portName Port to clear interrupts.
+ 	 \return uint8 variable read of I2C device
+ */
 uint8 rdIIC_Device(I2C_ChannelType channel, uint8 writeAddr, uint8 readAddr, uint8 regAddress, uint8 mask);
 
-void setDateAndTime(void);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief	 This function
+
+ 	 \param[in]  portName Port to clear interrupts.
+ 	 \return
+ 	 \todo Implement a mechanism to clear interrupts by a specific pin.
+ */
+//void setDateAndTime(void);
 
 #endif /* DEVICESIIC_H_ */
