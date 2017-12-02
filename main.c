@@ -33,32 +33,15 @@
  * @brief   Application entry point.
  */
 
-#include "MK64F12.h"
-#include "snake.h"
-#include "LCDNokia5110.h"
-#include "button.h"
-#include "menu.h"
-#include "SPI.h"
-#include "IIC.h"
-#include "accelerometer.h"
-
-
-
+#include <game.h>
 
 int main()
 {
-	buttonsReady();
-	initSPI();		 /*! Configuration function for the LCD port*/
-	IIC_init(I2C_0, busClock, BR_100, mul_4);
-	configIIC_Acc();
-	wr_Acc();
-	LCDNokia_init(); /*! Configuration function for the LCD */
-	LCDNokia_clear();
-	initSnakeParameters();
+	initGame();
 
 	while(TRUE)
 	{
-		gameLoop();
+		mainMenu();
 	}
 
 	return 0;

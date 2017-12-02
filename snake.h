@@ -25,7 +25,7 @@ typedef enum{DOWN = 1, UP}MotionY;
 typedef enum{HIGHEST = 1, LOWEST = 128}Pixels;
 typedef enum{BEGIN, DSTART}Conditionals;
 typedef enum{DEAD, ALIVE}GameOver;
-typedef enum{GDOWN, GUP, GLEFT, GRIGHT}Moving;
+typedef enum{GBACK, GDOWN, GUP, GLEFT, GRIGHT}Moving;
 
 typedef struct{
 
@@ -55,6 +55,9 @@ void input(void);
 void update(void);
 void moveSnakeAxisY(void);
 void introduceNewDataToField(void);
+
+void setAccel(void);
+void setManual(void);
 
 
 #endif /* SNAKE_H_ */

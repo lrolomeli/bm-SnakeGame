@@ -12,7 +12,8 @@
 #include "DataTypeDefinitions.h"
 
 #define ERROR 0x02
-#define NOBUTTONPRESSED 4
+#define NOBUTTONPRESSED 0
+#define STAY 3
 
 typedef struct
 {
@@ -228,9 +229,28 @@ void GPIO_clearPIN(GPIO_portNameType portName, uint8 pin);
  	 \return void
  */
 void GPIO_tooglePIN(GPIO_portNameType portName, uint8 pin);
-
-uint8 getMotion(void);
-
-void setMotion(void);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \return uint8 the button which was pressed
+ */
+uint8 getButton(void);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief This set the value of a specific variable.
+ 	 \return void
+ */
+void setButton(void);
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
+/*!
+ 	 \brief This set the value of a specific variable.
+ 	 \return void
+ */
+void keepPlaying(void);
 
 #endif /* GPIO_H_ */

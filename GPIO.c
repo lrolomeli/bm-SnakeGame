@@ -11,35 +11,43 @@
 
 GPIO_interruptFlags_t GPIO_intrStatusFlag = {0};
 
-uint8 motion = NOBUTTONPRESSED;
+uint8 buttonPressed = NOBUTTONPRESSED;
 
 
-void setMotion(void)
+void setButton(void)
 {
 
-	motion = NOBUTTONPRESSED;
+	buttonPressed = NOBUTTONPRESSED;
 
 }
 
-
-uint8 getMotion(void)
+void keepPlaying(void)
 {
 
-	return motion;
+	buttonPressed = STAY;
+}
+
+
+uint8 getButton(void)
+{
+
+	return buttonPressed;
 
 }
 
 void PORTB_IRQHandler()
 {
 	GPIO_clearInterrupt(GPIO_B);
-	if(!GPIO_readPIN(GPIO_B, BIT18))
-		motion = GDOWN;
+	if(!GPIO_readPIN(GPIO_B, BIT10))
+		buttonPressed = GBACK;
+	else if(!GPIO_readPIN(GPIO_B, BIT18))
+		buttonPressed = GDOWN;
 	else if(!GPIO_readPIN(GPIO_B, BIT19))
-		motion = GUP;
+		buttonPressed = GUP;
 	else if(!GPIO_readPIN(GPIO_B, BIT20))
-		motion = GLEFT;
+		buttonPressed = GLEFT;
 	else if(!GPIO_readPIN(GPIO_B, BIT11))
-		motion = GRIGHT;
+		buttonPressed = GRIGHT;
 
 }
 

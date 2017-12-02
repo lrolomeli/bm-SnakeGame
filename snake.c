@@ -11,6 +11,7 @@
 #include "PIT.h"
 #include "GPIO.h"
 #include "accelerometer.h"
+#include "menu.h"
 
 static snakeType snake[SNAKE_MAX_LENGTH];							//This structure is the snake
 static fruitPosition fruit;											//This structure is the fruit of the snake
@@ -21,6 +22,8 @@ static uint8 life = ALIVE;											//Indicates whether snake is alive
 static uint8 eatenFruit = FALSE;									//flag for eaten fruit
 static uint8 lastTailPositionX, lastTailPositionY, lastTailImage;						//Tail image and position previous run
 static uint8 endGame[] = "GAME OVER"; 								//String to be printed in the LCD
+static uint8 selectCtrl;
+static uint8 score = FALSE;
 
 void initSnakeParameters(void)
 {
@@ -151,10 +154,13 @@ void drawField(void)
 
 void gameLoop(void)
 {
-
+	setlocal();
+	LCDNokia_clear();
 	PIT_delay(PIT_0, SYSTEMCLOCK, 0.0001);
 
-	do{
+	/**Continue the game while we are alive and back have not been pressed*/
+	while(ALIVE == life && !(GBACK == getButton()))
+	{
 
 		xyz_Acc();
 
@@ -166,30 +172,36 @@ void gameLoop(void)
 			PIT_delay(PIT_0, SYSTEMCLOCK, 0.3);
 		}
 
-		if(DEAD == life){
-			setMotionAcc();//setMotion();
-			setMotion();
+		if(DEAD == life)
+		{
+			setMotionAcc();
 		}
-	}while(ALIVE == life/*&& 0 != getBackButton()*/); //Continue the game while we are alive and back have not been pressed
 
-	//if(back was pressed do not finish the game)
-	//{
-	//
-	//}
-
-	//else
-	//{
-
-	LCDNokia_gotoXY(10,2);
-	LCDNokia_sendString(endGame); /*! It print a string stored in an array*/
-
-	if(NOBUTTONPRESSED != getMotion()){
-		LCDNokia_clear();
-		initSnakeParameters();
-		life = ALIVE;
 	}
 
-	//}
+
+	if(ALIVE != life)
+	{
+
+		LCDNokia_gotoXY(10,2);
+		LCDNokia_sendString(endGame); /*! It prints a GAME OVER stored in an array*/
+
+
+
+		if(GBACK == getButton())
+		{
+			LCDNokia_clear();
+			initSnakeParameters();
+			life = ALIVE;
+			setRecord(score);
+			score = FALSE;
+
+		}
+		else
+			keepPlaying();
+	}
+
+
 
 }
 
@@ -263,42 +275,72 @@ void input(void)
 		//This flag indicates that fruit was eaten so the last position will be copied
 		//And will be send on the next move of the snake
 		eatenFruit = TRUE;
-
+		score++;
 		//This part saves the position and image of the current tail so the next tail will be incremented
 		lastTailPositionX = snake[currentSnakeSize - 1].snakePositionX;
 		lastTailPositionY = snake[currentSnakeSize - 1].snakePositionY;
 		lastTailImage = snake[currentSnakeSize - 1].image;
 	}
-
 	//If button 3 is pressed then snake will start moving right
 	if(NOBUTTONPRESSED != getMotionAcc()){
 
 		if(ALIVE == life) //of course while we are alive
 		{
 
-			if(GDOWN == getMotionAcc()/**getMotion()*/ && UP != snake[BEGIN].modifyPositionY)		//DOWN	/**cannot go down while moving up*/
+			if(selectCtrl)
 			{
-				snake[BEGIN].modifyPositionX = STOP;
-				snake[BEGIN].modifyPositionY = DOWN;
+				if(GDOWN == getButton()/**getMotion()*/ && UP != snake[BEGIN].modifyPositionY)		//DOWN	/**cannot go down while moving up*/
+				{
+					snake[BEGIN].modifyPositionX = STOP;
+					snake[BEGIN].modifyPositionY = DOWN;
+				}
+
+				if(GUP == getButton()/**getMotion()*/ && DOWN != snake[BEGIN].modifyPositionY)		//UP	/**cannot go up while moving down*/
+				{
+					snake[BEGIN].modifyPositionX = STOP;
+					snake[BEGIN].modifyPositionY = UP;
+				}
+
+				if(GLEFT == getButton()/**getMotion()*/ && RIGHT != snake[BEGIN].modifyPositionX)		//LEFT	/**cannot go left while moving right*/
+				{
+					snake[BEGIN].modifyPositionX = LEFT;
+					snake[BEGIN].modifyPositionY = STOP;
+				}
+
+				if(GRIGHT == getButton()/**getMotion()*/ && LEFT != snake[BEGIN].modifyPositionX)		//RIGHT	/**cannot go right while moving left*/
+				{
+					snake[BEGIN].modifyPositionX = RIGHT;
+					snake[BEGIN].modifyPositionY = STOP;
+				}
 			}
 
-			if(GUP == getMotionAcc()/**getMotion()*/ && DOWN != snake[BEGIN].modifyPositionY)		//UP	/**cannot go up while moving down*/
+			else
 			{
-				snake[BEGIN].modifyPositionX = STOP;
-				snake[BEGIN].modifyPositionY = UP;
+				if(GDOWN == getMotionAcc()/**getMotion()*/ && UP != snake[BEGIN].modifyPositionY)		//DOWN	/**cannot go down while moving up*/
+				{
+					snake[BEGIN].modifyPositionX = STOP;
+					snake[BEGIN].modifyPositionY = DOWN;
+				}
+
+				if(GUP == getMotionAcc()/**getMotion()*/ && DOWN != snake[BEGIN].modifyPositionY)		//UP	/**cannot go up while moving down*/
+				{
+					snake[BEGIN].modifyPositionX = STOP;
+					snake[BEGIN].modifyPositionY = UP;
+				}
+
+				if(GLEFT == getMotionAcc()/**getMotion()*/ && RIGHT != snake[BEGIN].modifyPositionX)		//LEFT	/**cannot go left while moving right*/
+				{
+					snake[BEGIN].modifyPositionX = LEFT;
+					snake[BEGIN].modifyPositionY = STOP;
+				}
+
+				if(GRIGHT == getMotionAcc()/**getMotion()*/ && LEFT != snake[BEGIN].modifyPositionX)		//RIGHT	/**cannot go right while moving left*/
+				{
+					snake[BEGIN].modifyPositionX = RIGHT;
+					snake[BEGIN].modifyPositionY = STOP;
+				}
 			}
 
-			if(GLEFT == getMotionAcc()/**getMotion()*/ && RIGHT != snake[BEGIN].modifyPositionX)		//LEFT	/**cannot go left while moving right*/
-			{
-				snake[BEGIN].modifyPositionX = LEFT;
-				snake[BEGIN].modifyPositionY = STOP;
-			}
-
-			if(GRIGHT == getMotionAcc()/**getMotion()*/ && LEFT != snake[BEGIN].modifyPositionX)		//RIGHT	/**cannot go right while moving left*/
-			{
-				snake[BEGIN].modifyPositionX = RIGHT;
-				snake[BEGIN].modifyPositionY = STOP;
-			}
 		}
 
 		/*
@@ -396,4 +438,15 @@ void introduceNewDataToField(void)
 	}
 
 	field[fruit.fruitPositionY][fruit.fruitPositionX] = fruit.image;
+}
+
+
+void setManual(void)
+{
+	selectCtrl = TRUE;
+}
+
+void setAccel(void)
+{
+	selectCtrl = FALSE;
 }

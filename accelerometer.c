@@ -44,13 +44,13 @@ void xyz_Acc(void)
 	if(Acc_X >13000 && Acc_X < 16400 && (Acc_Y > 15600 || Acc_Y < 400))
 		motion = GUP;
 
-	else if(Acc_X > 1700 && Acc_X < 10000 && (Acc_Y > 15000 || Acc_Y < 400))
+	else if(Acc_X > 700 && Acc_X < 10000 && (Acc_Y > 15000 || Acc_Y < 400))
 		motion = GDOWN;
 
-	else if(Acc_X < 1000 && Acc_Y > 12000 && Acc_Y < 15000)
+	else if(Acc_X < 1000 && Acc_Y > 12000 && Acc_Y < 15900)
 		motion = GLEFT;
 
-	else if(Acc_X > 100 && Acc_Y > 800 && Acc_Y < 3000)
+	else if(Acc_X > 100 && Acc_Y > 300 && Acc_Y < 3000)
 		motion = GRIGHT;
 
 

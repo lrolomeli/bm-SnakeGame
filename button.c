@@ -13,7 +13,7 @@
 
 const button_ConfigType button_Config = {GPIO_INPUT,
 										pinControlRegisterPORTBSW,
-										{GPIO_B,BIT18,BIT19,BIT20,BIT11},
+										{GPIO_B,BIT18,BIT19,BIT20,BIT11,BIT10},
 										PIT_CH0_IRQ,
 										PORTB_IRQ,
 										PRIORITY_7,
@@ -38,11 +38,13 @@ void button_init(const button_ConfigType* button_Config)
 	GPIO_pinControlRegister(button_Config->GPIOForButton.GPIO_portName, button_Config->GPIOForButton.button1, & (button_Config->pinControlRegisterPORTB));
 	GPIO_pinControlRegister(button_Config->GPIOForButton.GPIO_portName, button_Config->GPIOForButton.button2, & (button_Config->pinControlRegisterPORTB));
 	GPIO_pinControlRegister(button_Config->GPIOForButton.GPIO_portName, button_Config->GPIOForButton.button3, & (button_Config->pinControlRegisterPORTB));
+	GPIO_pinControlRegister(button_Config->GPIOForButton.GPIO_portName, button_Config->GPIOForButton.button4, & (button_Config->pinControlRegisterPORTB));
 	GPIO_clearIRQStatus(button_Config->GPIOForButton.GPIO_portName);
 	GPIO_dataDirectionPIN(button_Config->GPIOForButton.GPIO_portName,button_Config->GPIO_DataDirectionPin,button_Config->GPIOForButton.button0);
 	GPIO_dataDirectionPIN(button_Config->GPIOForButton.GPIO_portName,button_Config->GPIO_DataDirectionPin,button_Config->GPIOForButton.button1);
 	GPIO_dataDirectionPIN(button_Config->GPIOForButton.GPIO_portName,button_Config->GPIO_DataDirectionPin,button_Config->GPIOForButton.button2);
 	GPIO_dataDirectionPIN(button_Config->GPIOForButton.GPIO_portName,button_Config->GPIO_DataDirectionPin,button_Config->GPIOForButton.button3);
+	GPIO_dataDirectionPIN(button_Config->GPIOForButton.GPIO_portName,button_Config->GPIO_DataDirectionPin,button_Config->GPIOForButton.button4);
 	NVIC_setBASEPRI_threshold(button_Config->GlobalPriority);
 	NVIC_enableInterruptAndPriority(button_Config->GPIO_ISR, button_Config->GPIO_Priority);
 	NVIC_enableInterruptAndPriority(button_Config->PIT_ISR, button_Config->PIT_Priority);
