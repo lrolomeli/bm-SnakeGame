@@ -189,7 +189,6 @@ void ctrlScreen(void)
 
 void setlocal(void)
 {
-
 	local = 0;
 }
 
