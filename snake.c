@@ -185,16 +185,16 @@ void gameLoop(void)
 	{
 
 		LCDNokia_gotoXY(10,2);
-		LCDNokia_sendString(endGame); /*! It prints a GAME OVER stored in an array*/
+		LCDNokia_sendString(endGame); 	/*! It prints a GAME OVER stored in an array*/
 
 
 
 		if(GBACK == getButton())
 		{
 			LCDNokia_clear();
-			initSnakeParameters();
+			initSnakeParameters();		/*!Reinitialises the parameters of snake game*/
 			life = ALIVE;
-			setRecord(score);
+			setRecord(score);			/*!Stores scores*/
 			score = FALSE;
 
 		}
@@ -290,13 +290,13 @@ void input(void)
 
 			if(selectCtrl)
 			{
-				if(GDOWN == getButton()/**getMotion()*/ && UP != snake[BEGIN].modifyPositionY)		//DOWN	/**cannot go down while moving up*/
+				if(GDOWN == getButton()/**getMotion()*/ && UP != snake[BEGIN].modifyPositionY)			//DOWN	/**cannot go down while moving up*/
 				{
 					snake[BEGIN].modifyPositionX = STOP;
 					snake[BEGIN].modifyPositionY = DOWN;
 				}
 
-				if(GUP == getButton()/**getMotion()*/ && DOWN != snake[BEGIN].modifyPositionY)		//UP	/**cannot go up while moving down*/
+				if(GUP == getButton()/**getMotion()*/ && DOWN != snake[BEGIN].modifyPositionY)			//UP	/**cannot go up while moving down*/
 				{
 					snake[BEGIN].modifyPositionX = STOP;
 					snake[BEGIN].modifyPositionY = UP;
@@ -329,13 +329,13 @@ void input(void)
 					snake[BEGIN].modifyPositionY = UP;
 				}
 
-				if(GLEFT == getDirection()/**getMotion()*/ && RIGHT != snake[BEGIN].modifyPositionX)		//LEFT	/**cannot go left while moving right*/
+				if(GLEFT == getDirection()/**getMotion()*/ && RIGHT != snake[BEGIN].modifyPositionX)	//LEFT	/**cannot go left while moving right*/
 				{
 					snake[BEGIN].modifyPositionX = LEFT;
 					snake[BEGIN].modifyPositionY = STOP;
 				}
 
-				if(GRIGHT == getDirection()/**getMotion()*/ && LEFT != snake[BEGIN].modifyPositionX)		//RIGHT	/**cannot go right while moving left*/
+				if(GRIGHT == getDirection()/**getMotion()*/ && LEFT != snake[BEGIN].modifyPositionX)	//RIGHT	/**cannot go right while moving left*/
 				{
 					snake[BEGIN].modifyPositionX = RIGHT;
 					snake[BEGIN].modifyPositionY = STOP;
@@ -440,7 +440,6 @@ void introduceNewDataToField(void)
 
 	field[fruit.fruitPositionY][fruit.fruitPositionX] = fruit.image;
 }
-
 
 void setManual(void)
 {

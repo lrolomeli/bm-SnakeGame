@@ -38,9 +38,12 @@ void screenMenu(void)
 
 
 }
-
+/**
+ * This function stores 5 elements in 5 different directions in EEPROM
+ */
 void storeScores(void)
 {
+
 	wrByte(I2C_0, WREEPROM, 0x0F, 0xF0, scores[4]);
 	delay(800);
 	wrByte(I2C_0, WREEPROM, 0x0F, 0xF1, scores[3]);
@@ -53,7 +56,9 @@ void storeScores(void)
 	delay(800);
 }
 
-
+/**
+ * This function reads 5 elements in 5 directions in EEPROM
+ */
 void loadScores(void)
 {
 	scores[4] = rdByte(I2C_0, WREEPROM, RDEEPROM, 0x0F, 0xF0);
@@ -63,6 +68,11 @@ void loadScores(void)
 	scores[0] = rdByte(I2C_0, WREEPROM, RDEEPROM, 0x0F, 0xF4);
 }
 
+/**
+ * This function applies a sort method called bubble sort
+ *  which classify and sort the numbers from highest to lowest
+ *  but first check if the current score is actually higher than previous scores
+ */
 void setRecord(uint8 score)
 {
 	uint8 sort2, sort1, aux_score;
@@ -186,13 +196,14 @@ void ctrlScreen(void)
 		setAccel();
 }
 
-
+/**It help the lcd nokia to stop refreshing the lcd and prevent erasing images*/
 void setlocal(void)
 {
 
 	local = 0;
-}
 
+}
+/**This only converts a number to a character so then we can send it from an LCD function*/
 void digiToAscii(uint8 var)
 {
 
