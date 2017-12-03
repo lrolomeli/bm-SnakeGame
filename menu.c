@@ -199,7 +199,6 @@ void ctrlScreen(void)
 /**It help the lcd nokia to stop refreshing the lcd and prevent erasing images*/
 void setlocal(void)
 {
-
 	local = 0;
 
 }
